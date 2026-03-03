@@ -1,5 +1,8 @@
 """Tests for breadcrumb.core.healer."""
 
+from __future__ import annotations
+
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -10,7 +13,7 @@ from breadcrumb.core.storage import FingerprintStore
 
 
 @pytest.fixture
-def store(tmp_path: Path) -> FingerprintStore:
+def store(tmp_path: Path) -> Generator[FingerprintStore, None, None]:
     db_path = tmp_path / "test.breadcrumb.db"
     s = FingerprintStore(db_path)
     yield s
@@ -70,17 +73,21 @@ class TestHealSuccess:
     def test_id_renamed(self, healer: Healer) -> None:
         """Blueprint scenario: #login-btn renamed to .auth-button."""
         stored = _make_fp(
-            tag="button", text="sign in",
+            tag="button",
+            text="sign in",
             attrs={"id": "login-btn", "class": "btn primary"},
-            locator="#login-btn", test_id="test_login",
+            locator="#login-btn",
+            test_id="test_login",
         )
         healer.save(stored)
         candidate = _make_fp(
-            tag="button", text="sign in",
+            tag="button",
+            text="sign in",
             attrs={"class": "auth-button"},
             dom_path=("html", "body", "form", "button"),
             siblings=("input", "label"),
-            locator="", test_id="",
+            locator="",
+            test_id="",
         )
         result = healer.heal("test_login", "#login-btn", [candidate])
         assert result.healed is True
@@ -143,12 +150,14 @@ class TestHealFailure:
         stored = _make_fp()
         healer.save(stored)
         terrible = _make_fp(
-            tag="span", text="copyright 2026",
+            tag="span",
+            text="copyright 2026",
             attrs={"class": "footer-text"},
             dom_path=("html", "body", "footer", "span"),
             siblings=("a",),
             bbox=BoundingBox(x=0, y=900, width=200, height=20),
-            locator="", test_id="",
+            locator="",
+            test_id="",
         )
         result = healer.heal("test_submit", "#submit-btn", [terrible])
         assert result.healed is False
@@ -159,10 +168,14 @@ class TestHealFailure:
         stored = _make_fp()
         healer.save(stored)
         terrible = _make_fp(
-            tag="span", text="nope", attrs={},
-            dom_path=("html",), siblings=(),
+            tag="span",
+            text="nope",
+            attrs={},
+            dom_path=("html",),
+            siblings=(),
             bbox=BoundingBox(x=0, y=900, width=10, height=10),
-            locator="", test_id="",
+            locator="",
+            test_id="",
         )
         healer.heal("test_submit", "#submit-btn", [terrible])
         assert len(healer.store.get_healing_events()) == 0
@@ -181,21 +194,25 @@ class TestHealAllScores:
 
 class TestCustomThreshold:
     def test_high_threshold_rejects(self, store: FingerprintStore) -> None:
-        healer = Healer(store=store, threshold=0.99)
+        strict_healer = Healer(store=store, threshold=0.99)
         stored = _make_fp()
-        healer.save(stored)
+        strict_healer.save(stored)
         candidate = _make_fp(text="send", locator="", test_id="")
-        result = healer.heal("test_submit", "#submit-btn", [candidate])
+        result = strict_healer.heal("test_submit", "#submit-btn", [candidate])
         assert result.healed is False
 
     def test_low_threshold_accepts(self, store: FingerprintStore) -> None:
-        healer = Healer(store=store, threshold=0.1)
+        lenient_healer = Healer(store=store, threshold=0.1)
         stored = _make_fp()
-        healer.save(stored)
+        lenient_healer.save(stored)
         weak = _make_fp(
-            tag="button", text="cancel", attrs={"class": "secondary"},
+            tag="button",
+            text="cancel",
+            attrs={"class": "secondary"},
             dom_path=("html", "body", "div", "button"),
-            siblings=(), locator="", test_id="",
+            siblings=(),
+            locator="",
+            test_id="",
         )
-        result = healer.heal("test_submit", "#submit-btn", [weak])
+        result = lenient_healer.heal("test_submit", "#submit-btn", [weak])
         assert result.healed is True

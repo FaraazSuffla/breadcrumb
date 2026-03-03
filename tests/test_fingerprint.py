@@ -1,5 +1,7 @@
 """Tests for breadcrumb.core.fingerprint."""
 
+from __future__ import annotations
+
 import pytest
 
 from breadcrumb.core.fingerprint import BoundingBox, ElementFingerprint
@@ -50,14 +52,22 @@ class TestElementFingerprint:
 
     def test_frozen(self) -> None:
         fp = ElementFingerprint(
-            tag="div", text="", attributes=frozenset(), dom_path=(), siblings=()
+            tag="div",
+            text="",
+            attributes=frozenset(),
+            dom_path=(),
+            siblings=(),
         )
         with pytest.raises(AttributeError):
             fp.tag = "span"  # type: ignore[misc]
 
     def test_defaults(self) -> None:
         fp = ElementFingerprint(
-            tag="a", text="click", attributes=frozenset(), dom_path=(), siblings=()
+            tag="a",
+            text="click",
+            attributes=frozenset(),
+            dom_path=(),
+            siblings=(),
         )
         assert fp.bbox is None
         assert fp.locator == ""

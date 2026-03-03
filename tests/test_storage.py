@@ -1,6 +1,9 @@
 """Tests for breadcrumb.core.storage."""
 
+from __future__ import annotations
+
 import time
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -10,7 +13,7 @@ from breadcrumb.core.storage import FingerprintStore, HealingEvent
 
 
 @pytest.fixture
-def store(tmp_path: Path) -> FingerprintStore:
+def store(tmp_path: Path) -> Generator[FingerprintStore, None, None]:
     """Create a FingerprintStore with a temporary database."""
     db_path = tmp_path / "test.breadcrumb.db"
     s = FingerprintStore(db_path)
@@ -43,9 +46,9 @@ class TestDatabaseCreation:
         assert store.db_path.exists()
 
     def test_schema_version(self, store: FingerprintStore) -> None:
-        conn = store._get_conn()
+        conn = store._get_conn()  # noqa: SLF001
         row = conn.execute(
-            "SELECT value FROM schema_meta WHERE key = 'schema_version'"
+            "SELECT value FROM schema_meta WHERE key = 'schema_version'",
         ).fetchone()
         assert row is not None
         assert row["value"] == "1"
@@ -63,7 +66,9 @@ class TestDatabaseCreation:
 
 class TestFingerprintCRUD:
     def test_save_and_load(
-        self, store: FingerprintStore, sample_fp: ElementFingerprint
+        self,
+        store: FingerprintStore,
+        sample_fp: ElementFingerprint,
     ) -> None:
         store.save_fingerprint(sample_fp)
         loaded = store.load_fingerprint("test_submit", "#submit-btn")
@@ -77,7 +82,9 @@ class TestFingerprintCRUD:
         assert store.load_fingerprint("nope", "nope") is None
 
     def test_save_updates_existing(
-        self, store: FingerprintStore, sample_fp: ElementFingerprint
+        self,
+        store: FingerprintStore,
+        sample_fp: ElementFingerprint,
     ) -> None:
         store.save_fingerprint(sample_fp)
 
@@ -99,22 +106,32 @@ class TestFingerprintCRUD:
 
     def test_save_without_test_id_raises(self, store: FingerprintStore) -> None:
         fp = ElementFingerprint(
-            tag="div", text="", attributes=frozenset(),
-            dom_path=(), siblings=(), locator="#x",
+            tag="div",
+            text="",
+            attributes=frozenset(),
+            dom_path=(),
+            siblings=(),
+            locator="#x",
         )
         with pytest.raises(ValueError, match="test_id"):
             store.save_fingerprint(fp)
 
     def test_save_without_locator_raises(self, store: FingerprintStore) -> None:
         fp = ElementFingerprint(
-            tag="div", text="", attributes=frozenset(),
-            dom_path=(), siblings=(), test_id="test_x",
+            tag="div",
+            text="",
+            attributes=frozenset(),
+            dom_path=(),
+            siblings=(),
+            test_id="test_x",
         )
         with pytest.raises(ValueError, match="locator"):
             store.save_fingerprint(fp)
 
     def test_delete_fingerprint(
-        self, store: FingerprintStore, sample_fp: ElementFingerprint
+        self,
+        store: FingerprintStore,
+        sample_fp: ElementFingerprint,
     ) -> None:
         store.save_fingerprint(sample_fp)
         assert store.delete_fingerprint("test_submit", "#submit-btn") is True
@@ -124,14 +141,20 @@ class TestFingerprintCRUD:
         assert store.delete_fingerprint("nope", "nope") is False
 
     def test_get_all_fingerprints(
-        self, store: FingerprintStore, sample_fp: ElementFingerprint
+        self,
+        store: FingerprintStore,
+        sample_fp: ElementFingerprint,
     ) -> None:
         store.save_fingerprint(sample_fp)
 
         fp2 = ElementFingerprint(
-            tag="input", text="", attributes=frozenset(),
-            dom_path=(), siblings=(),
-            locator=".email", test_id="test_login",
+            tag="input",
+            text="",
+            attributes=frozenset(),
+            dom_path=(),
+            siblings=(),
+            locator=".email",
+            test_id="test_login",
         )
         store.save_fingerprint(fp2)
 
@@ -139,7 +162,9 @@ class TestFingerprintCRUD:
         assert len(all_fps) == 2
 
     def test_clear(
-        self, store: FingerprintStore, sample_fp: ElementFingerprint
+        self,
+        store: FingerprintStore,
+        sample_fp: ElementFingerprint,
     ) -> None:
         store.save_fingerprint(sample_fp)
         store.clear()
@@ -152,7 +177,11 @@ class TestFingerprintCRUD:
 
 
 class TestHealingEvents:
-    def _make_event(self, test_id: str = "test_login", locator: str = "#btn") -> HealingEvent:
+    def _make_event(
+        self,
+        test_id: str = "test_login",
+        locator: str = "#btn",
+    ) -> HealingEvent:
         return HealingEvent(
             test_id=test_id,
             locator=locator,
@@ -197,13 +226,19 @@ class TestHealingEvents:
 
     def test_ordered_by_timestamp_desc(self, store: FingerprintStore) -> None:
         e1 = HealingEvent(
-            test_id="t", locator="#a", confidence=0.8,
-            original_fingerprint={}, healed_fingerprint={},
+            test_id="t",
+            locator="#a",
+            confidence=0.8,
+            original_fingerprint={},
+            healed_fingerprint={},
             timestamp=1000.0,
         )
         e2 = HealingEvent(
-            test_id="t", locator="#a", confidence=0.9,
-            original_fingerprint={}, healed_fingerprint={},
+            test_id="t",
+            locator="#a",
+            confidence=0.9,
+            original_fingerprint={},
+            healed_fingerprint={},
             timestamp=2000.0,
         )
         store.record_healing(e1)

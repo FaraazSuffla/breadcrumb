@@ -1,5 +1,7 @@
 """Tests for breadcrumb.core.similarity."""
 
+from __future__ import annotations
+
 import pytest
 
 from breadcrumb.core.fingerprint import BoundingBox, ElementFingerprint
@@ -222,8 +224,8 @@ class TestPositionSimilarity:
 
 
 class TestComputeSimilarity:
-    def _make_fp(self, **overrides) -> ElementFingerprint:
-        defaults = {
+    def _make_fp(self, **overrides: object) -> ElementFingerprint:
+        defaults: dict[str, object] = {
             "tag": "button",
             "text": "submit",
             "attributes": frozenset({("id", "btn"), ("class", "primary")}),
@@ -232,13 +234,15 @@ class TestComputeSimilarity:
             "bbox": BoundingBox(x=100, y=200, width=80, height=40),
         }
         defaults.update(overrides)
-        return ElementFingerprint(**defaults)
+        return ElementFingerprint(**defaults)  # type: ignore[arg-type]
 
     def test_identical_elements(self) -> None:
         fp = self._make_fp()
         result = compute_similarity(fp, fp)
         assert result.total == pytest.approx(1.0, abs=0.01)
-        assert all(v == pytest.approx(1.0, abs=0.01) for v in result.breakdown.values())
+        assert all(
+            v == pytest.approx(1.0, abs=0.01) for v in result.breakdown.values()
+        )
 
     def test_completely_different(self) -> None:
         a = self._make_fp()
@@ -271,9 +275,16 @@ class TestComputeSimilarity:
     def test_custom_weights(self) -> None:
         fp = self._make_fp()
         result = compute_similarity(
-            fp, fp,
-            weights={"tag": 1.0, "text": 0.0, "attributes": 0.0,
-                     "dom_path": 0.0, "siblings": 0.0, "position": 0.0},
+            fp,
+            fp,
+            weights={
+                "tag": 1.0,
+                "text": 0.0,
+                "attributes": 0.0,
+                "dom_path": 0.0,
+                "siblings": 0.0,
+                "position": 0.0,
+            },
         )
         assert result.total == pytest.approx(1.0)
 
