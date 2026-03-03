@@ -23,6 +23,37 @@ from breadcrumb.core.fingerprint import ElementFingerprint
 SCHEMA_VERSION = 1
 DEFAULT_DB_PATH = ".breadcrumb.db"
 
+_CREATE_TABLES_SQL = """\
+CREATE TABLE IF NOT EXISTS schema_meta (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS fingerprints (
+    test_id TEXT NOT NULL,
+    locator TEXT NOT NULL,
+    fingerprint_json TEXT NOT NULL,
+    updated_at REAL NOT NULL,
+    PRIMARY KEY (test_id, locator)
+);
+
+CREATE TABLE IF NOT EXISTS healing_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    test_id TEXT NOT NULL,
+    locator TEXT NOT NULL,
+    confidence REAL NOT NULL,
+    original_json TEXT NOT NULL,
+    healed_json TEXT NOT NULL,
+    timestamp REAL NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_healing_test
+    ON healing_events (test_id);
+
+CREATE INDEX IF NOT EXISTS idx_healing_locator
+    ON healing_events (test_id, locator);
+"""
+
 
 @dataclass
 class HealingEvent:
@@ -39,7 +70,8 @@ class HealingEvent:
 class FingerprintStore:
     """SQLite-backed storage for fingerprints and healing events.
 
-    Usage:
+    Usage::
+
         store = FingerprintStore()          # Uses .breadcrumb.db in cwd
         store = FingerprintStore("path/to/db.sqlite")
         store.save_fingerprint(fingerprint)
@@ -70,40 +102,10 @@ class FingerprintStore:
     def _ensure_db(self) -> None:
         """Create tables if they don't exist."""
         conn = self._get_conn()
-
-        conn.executescript(
-            "CREATE TABLE IF NOT EXISTS schema_meta ("
-            "    key TEXT PRIMARY KEY,"
-            "    value TEXT NOT NULL"
-            ");"
-            ""
-            "CREATE TABLE IF NOT EXISTS fingerprints ("
-            "    test_id TEXT NOT NULL,"
-            "    locator TEXT NOT NULL,"
-            "    fingerprint_json TEXT NOT NULL,"
-            "    updated_at REAL NOT NULL,"
-            "    PRIMARY KEY (test_id, locator)"
-            ");"
-            ""
-            "CREATE TABLE IF NOT EXISTS healing_events ("
-            "    id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            "    test_id TEXT NOT NULL,"
-            "    locator TEXT NOT NULL,"
-            "    confidence REAL NOT NULL,"
-            "    original_json TEXT NOT NULL,"
-            "    healed_json TEXT NOT NULL,"
-            "    timestamp REAL NOT NULL"
-            ");"
-            ""
-            "CREATE INDEX IF NOT EXISTS idx_healing_test"
-            "    ON healing_events (test_id);"
-            ""
-            "CREATE INDEX IF NOT EXISTS idx_healing_locator"
-            "    ON healing_events (test_id, locator);"
-        )
+        conn.executescript(_CREATE_TABLES_SQL)
 
         row = conn.execute(
-            "SELECT value FROM schema_meta WHERE key = 'schema_version'"
+            "SELECT value FROM schema_meta WHERE key = 'schema_version'",
         ).fetchone()
         if row is None:
             conn.execute(
@@ -121,9 +123,11 @@ class FingerprintStore:
             ValueError: If test_id or locator is empty.
         """
         if not fingerprint.test_id:
-            raise ValueError("Fingerprint must have a test_id to be stored.")
+            msg = "Fingerprint must have a test_id to be stored."
+            raise ValueError(msg)
         if not fingerprint.locator:
-            raise ValueError("Fingerprint must have a locator to be stored.")
+            msg = "Fingerprint must have a locator to be stored."
+            raise ValueError(msg)
 
         conn = self._get_conn()
         conn.execute(
@@ -155,7 +159,7 @@ class FingerprintStore:
         if row is None:
             return None
 
-        data = json.loads(row["fingerprint_json"])
+        data: dict[str, Any] = json.loads(row[0])  # type: ignore[index]
         return ElementFingerprint.from_dict(data)
 
     def record_healing(self, event: HealingEvent) -> None:
@@ -177,7 +181,9 @@ class FingerprintStore:
         conn.commit()
 
     def get_healing_events(
-        self, test_id: str | None = None, locator: str | None = None
+        self,
+        test_id: str | None = None,
+        locator: str | None = None,
     ) -> list[HealingEvent]:
         """Query healing events, optionally filtered by test and/or locator.
 
@@ -203,14 +209,14 @@ class FingerprintStore:
         rows = conn.execute(query, params).fetchall()
         return [
             HealingEvent(
-                test_id=row["test_id"],
-                locator=row["locator"],
-                confidence=row["confidence"],
-                original_fingerprint=json.loads(row["original_json"]),
-                healed_fingerprint=json.loads(row["healed_json"]),
-                timestamp=row["timestamp"],
+                test_id=r["test_id"],  # type: ignore[index]
+                locator=r["locator"],  # type: ignore[index]
+                confidence=r["confidence"],  # type: ignore[index]
+                original_fingerprint=json.loads(r["original_json"]),  # type: ignore[index]
+                healed_fingerprint=json.loads(r["healed_json"]),  # type: ignore[index]
+                timestamp=r["timestamp"],  # type: ignore[index]
             )
-            for row in rows
+            for r in rows
         ]
 
     def get_all_fingerprints(self) -> list[ElementFingerprint]:
@@ -218,8 +224,8 @@ class FingerprintStore:
         conn = self._get_conn()
         rows = conn.execute("SELECT fingerprint_json FROM fingerprints").fetchall()
         return [
-            ElementFingerprint.from_dict(json.loads(row["fingerprint_json"]))
-            for row in rows
+            ElementFingerprint.from_dict(json.loads(r[0]))  # type: ignore[index]
+            for r in rows
         ]
 
     def delete_fingerprint(self, test_id: str, locator: str) -> bool:
@@ -242,8 +248,10 @@ class FingerprintStore:
     def stats(self) -> dict[str, int]:
         """Return counts of fingerprints and healing events."""
         conn = self._get_conn()
-        fp_count = conn.execute("SELECT COUNT(*) FROM fingerprints").fetchone()[0]
-        he_count = conn.execute("SELECT COUNT(*) FROM healing_events").fetchone()[0]
+        fp_row = conn.execute("SELECT COUNT(*) FROM fingerprints").fetchone()
+        he_row = conn.execute("SELECT COUNT(*) FROM healing_events").fetchone()
+        fp_count: int = fp_row[0] if fp_row is not None else 0  # type: ignore[index]
+        he_count: int = he_row[0] if he_row is not None else 0  # type: ignore[index]
         return {"fingerprints": fp_count, "healing_events": he_count}
 
     def close(self) -> None:
