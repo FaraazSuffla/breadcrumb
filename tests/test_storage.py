@@ -46,7 +46,7 @@ class TestDatabaseCreation:
         assert store.db_path.exists()
 
     def test_schema_version(self, store: FingerprintStore) -> None:
-        conn = store._get_conn()  # noqa: SLF001
+        conn = store._get_conn()
         row = conn.execute(
             "SELECT value FROM schema_meta WHERE key = 'schema_version'",
         ).fetchone()

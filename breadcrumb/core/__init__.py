@@ -7,11 +7,11 @@ from breadcrumb.core.storage import FingerprintStore, HealingEvent
 
 __all__ = [
     "BoundingBox",
+    "compute_similarity",
     "ElementFingerprint",
+    "FingerprintStore",
+    "HealingEvent",
     "HealResult",
     "Healer",
     "ScoringResult",
-    "compute_similarity",
-    "FingerprintStore",
-    "HealingEvent",
 ]

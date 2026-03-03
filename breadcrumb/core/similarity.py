@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Sequence  # noqa: UP035
 
 from breadcrumb.core.fingerprint import BoundingBox, ElementFingerprint
 
