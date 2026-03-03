@@ -72,9 +72,10 @@ def text_similarity(a: str, b: str) -> float:
 
 
 def jaccard_similarity(
-    set_a: frozenset[tuple[str, str]], set_b: frozenset[tuple[str, str]]
+    set_a: frozenset[tuple[str, str]],
+    set_b: frozenset[tuple[str, str]],
 ) -> float:
-    """Jaccard similarity coefficient: J(A, B) = |A \u2229 B| / |A \u222a B|.
+    """Jaccard similarity coefficient: ``J(A, B) = |A \u2229 B| / |A \u222a B|``.
 
     Used for comparing attribute sets. Returns 0.0 when both sets are empty.
     """

@@ -44,7 +44,8 @@ class HealResult:
 class Healer:
     """Self-healing engine that finds replacement elements when locators break.
 
-    Usage:
+    Usage::
+
         healer = Healer()
         healer.save(fingerprint)          # on passing run
         result = healer.heal(             # on failing run
@@ -106,7 +107,12 @@ class Healer:
                 test_id,
                 locator,
             )
-            return HealResult(healed=False, candidate=None, score=None, all_scores=[])
+            return HealResult(
+                healed=False,
+                candidate=None,
+                score=None,
+                all_scores=[],
+            )
 
         if not candidates:
             logger.info(
@@ -114,7 +120,12 @@ class Healer:
                 test_id,
                 locator,
             )
-            return HealResult(healed=False, candidate=None, score=None, all_scores=[])
+            return HealResult(
+                healed=False,
+                candidate=None,
+                score=None,
+                all_scores=[],
+            )
 
         # Score all candidates
         scored: list[tuple[ElementFingerprint, ScoringResult]] = []
@@ -161,7 +172,7 @@ class Healer:
 
         # Update stored fingerprint to the healed element
         updated = ElementFingerprint.from_dict(
-            {**best_candidate.to_dict(), "locator": locator, "test_id": test_id}
+            {**best_candidate.to_dict(), "locator": locator, "test_id": test_id},
         )
         self._store.save_fingerprint(updated)
 

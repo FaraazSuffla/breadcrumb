@@ -42,15 +42,11 @@ class ElementFingerprint:
         tag: HTML tag name, lowercased (e.g. "button", "input", "div").
         text: Visible text content, stripped and lowercased.
         attributes: Frozen set of (name, value) pairs for all HTML attributes.
-        dom_path: List of ancestor tag names from root to this element
-            (e.g. ["html", "body", "div", "form", "button"]).
-        siblings: Tuple of tag names of immediate sibling elements, ordered
-            as they appear in the DOM.
+        dom_path: Tuple of ancestor tag names from root to this element.
+        siblings: Tuple of tag names of immediate sibling elements.
         bbox: Bounding box at fingerprint time, or None if not available.
-        locator: The original locator string used to find this element
-            (e.g. "#login-btn", "text=Submit"). Used as the storage key.
-        test_id: Identifier for the test that created this fingerprint
-            (e.g. "test_login"). Used to scope fingerprints per test.
+        locator: The original locator string used to find this element.
+        test_id: Identifier for the test that created this fingerprint.
     """
 
     tag: str
@@ -117,7 +113,9 @@ class ElementFingerprint:
         dom_path = tuple(raw_dom) if not isinstance(raw_dom, tuple) else raw_dom
 
         raw_siblings = data.get("siblings", ())
-        siblings = tuple(raw_siblings) if not isinstance(raw_siblings, tuple) else raw_siblings
+        siblings = (
+            tuple(raw_siblings) if not isinstance(raw_siblings, tuple) else raw_siblings
+        )
 
         return cls(
             tag=cls._normalize_tag(data.get("tag", "")),
