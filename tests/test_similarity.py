@@ -62,9 +62,8 @@ class TestLevenshteinDistance:
         assert levenshtein_distance("abc", "xyz") == 3
 
     def test_sign_in_vs_log_in(self) -> None:
-        # Practical test case from the blueprint
         dist = levenshtein_distance("sign in", "log in")
-        assert dist == 3  # s->l, i->o, gn->g
+        assert dist == 3
 
 
 # ---------------------------------------------------------------------------
@@ -93,8 +92,6 @@ class TestTextSimilarity:
 
     def test_close_match(self) -> None:
         score = text_similarity("submit", "Submit")
-        # After normalization in fingerprint these would be identical,
-        # but raw comparison shows case difference
         assert score > 0.7
 
 
@@ -116,8 +113,6 @@ class TestJaccardSimilarity:
     def test_overlap(self) -> None:
         a = frozenset({("id", "btn"), ("class", "primary"), ("type", "submit")})
         b = frozenset({("id", "btn"), ("class", "secondary")})
-        # Intersection: {("id", "btn")} = 1
-        # Union: all 4 unique pairs = 4
         assert jaccard_similarity(a, b) == 1 / 4
 
     def test_both_empty(self) -> None:
@@ -150,7 +145,7 @@ class TestLCSLength:
     def test_dom_path_example(self) -> None:
         path_a = ["html", "body", "div", "form", "button"]
         path_b = ["html", "body", "main", "div", "form", "button"]
-        assert lcs_length(path_a, path_b) == 5  # html, body, div, form, button
+        assert lcs_length(path_a, path_b) == 5
 
 
 # ---------------------------------------------------------------------------
@@ -271,13 +266,10 @@ class TestComputeSimilarity:
             attributes=frozenset({("class", "auth-button btn")}),
         )
         result = compute_similarity(stored, candidate)
-        # Tag matches, text matches, DOM/siblings/position match.
-        # Only attributes partially differ. Should still score high.
         assert result.total > 0.7
 
     def test_custom_weights(self) -> None:
         fp = self._make_fp()
-        # Weight only tag match
         result = compute_similarity(
             fp, fp,
             weights={"tag": 1.0, "text": 0.0, "attributes": 0.0,
