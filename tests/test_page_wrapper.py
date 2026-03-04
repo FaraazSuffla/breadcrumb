@@ -9,8 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from breadcrumb.core.fingerprint import BoundingBox, ElementFingerprint
-from breadcrumb.core.healer import HealResult, Healer
-from breadcrumb.core.similarity import ScoringResult
+from breadcrumb.core.healer import Healer
 from breadcrumb.core.storage import FingerprintStore
 from breadcrumb.playwright.page_wrapper import (
     HealableLocator,
@@ -405,7 +404,7 @@ class TestSelectorBuilding:
             siblings=(),
         )
         selector = loc._build_healed_selector(fp)
-        assert "div.card.primary" == selector
+        assert selector == "div.card.primary"
 
     def test_falls_back_to_role(self, healable_page: HealablePage) -> None:
         loc = self._make_loc(healable_page)
