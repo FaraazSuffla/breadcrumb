@@ -82,7 +82,7 @@ _state: BreadcrumbState | None = None
 
 def pytest_configure(config: pytest.Config) -> None:
     """Set up shared Breadcrumb state if the plugin is enabled."""
-    global _state  # noqa: PLW0603
+    global _state
     if config.getoption("breadcrumb", default=False):
         db_path = config.getoption("breadcrumb_db", default=".breadcrumb.db")
         threshold = config.getoption("breadcrumb_threshold", default=0.5)
@@ -96,7 +96,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 def pytest_unconfigure(config: pytest.Config) -> None:
     """Tear down shared state."""
-    global _state  # noqa: PLW0603
+    global _state
     if _state is not None:
         _state.close()
         _state = None
