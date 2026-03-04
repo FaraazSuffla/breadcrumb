@@ -16,6 +16,8 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: pip install -e ".[dev]"
+      - name: Sort imports (isort via ruff)
+        run: ruff check --select I --fix .
       - name: Lint with ruff
         run: ruff check .
       - name: Format check
