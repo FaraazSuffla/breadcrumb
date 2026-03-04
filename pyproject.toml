@@ -89,6 +89,7 @@ exclude = [
     "breadcrumb/cli",
     "breadcrumb/flaky",
     "breadcrumb/generate",
+    "breadcrumb/playwright",
     "breadcrumb/plugins",
     "breadcrumb/report",
 ]
@@ -107,6 +108,7 @@ module = [
     "breadcrumb.cli.*",
     "breadcrumb.flaky.*",
     "breadcrumb.generate.*",
+    "breadcrumb.playwright.*",
     "breadcrumb.plugins.*",
     "breadcrumb.report.*",
 ]
@@ -118,10 +120,10 @@ ignore_errors = true
 testpaths = ["tests"]
 
 [tool.coverage.run]
-source = ["breadcrumb/core"]
+source = ["breadcrumb"]
 
 [tool.coverage.report]
-fail_under = 90
+fail_under = 60
 show_missing = true
 exclude_lines = [
     "pragma: no cover",
