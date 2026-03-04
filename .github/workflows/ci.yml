@@ -16,8 +16,10 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: pip install -e ".[dev]"
-      - name: Auto-fix safe lint issues (isort, __all__ sorting)
-        run: ruff check --select I,RUF022 --fix .
+      - name: Auto-format (ruff)
+        run: |
+          ruff check --select I,RUF022 --fix .
+          ruff format .
       - name: Lint with ruff
         run: ruff check .
       - name: Format check
