@@ -5,13 +5,12 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
-from breadcrumb.plugins.pytest_plugin import BreadcrumbState
 import breadcrumb.plugins.pytest_plugin as plugin_module
-
+from breadcrumb.plugins.pytest_plugin import BreadcrumbState
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -158,9 +157,7 @@ class TestTerminalSummary:
 
     def test_prints_summary_with_no_events(self, tmp_path: Path) -> None:
         db = str(tmp_path / "bc.db")
-        config = _make_config(
-            breadcrumb=True, breadcrumb_db=db, breadcrumb_report=True
-        )
+        config = _make_config(breadcrumb=True, breadcrumb_db=db, breadcrumb_report=True)
         plugin_module.pytest_configure(config)
         reporter = self._make_reporter()
 
@@ -175,16 +172,15 @@ class TestTerminalSummary:
 
     def test_prints_recent_events(self, tmp_path: Path) -> None:
         db = str(tmp_path / "bc.db")
-        config = _make_config(
-            breadcrumb=True, breadcrumb_db=db, breadcrumb_report=True
-        )
+        config = _make_config(breadcrumb=True, breadcrumb_db=db, breadcrumb_report=True)
         plugin_module.pytest_configure(config)
         assert plugin_module._state is not None
 
         # Insert a real healing event
+        import time
+
         from breadcrumb.core.fingerprint import ElementFingerprint
         from breadcrumb.core.storage import HealingEvent
-        import time
 
         fp = ElementFingerprint(
             tag="button",
@@ -223,6 +219,7 @@ class TestTerminalSummary:
 def _call_heal_page(request: MagicMock) -> Any:
     """Call the heal_page fixture function directly, bypassing pytest's fixture mechanism."""
     import inspect
+
     raw_fn = inspect.unwrap(plugin_module.heal_page)
     gen = raw_fn(request)
     return next(gen)
@@ -250,6 +247,7 @@ class TestHealPageFixture:
         healable = _call_heal_page(request)
 
         from breadcrumb.playwright.page_wrapper import HealablePage
+
         assert isinstance(healable, HealablePage)
         assert healable.healer is state.healer
         assert healable.test_id == "tests/test_x.py::test_y"
@@ -270,6 +268,7 @@ class TestHealPageFixture:
         healable = _call_heal_page(request)
 
         from breadcrumb.playwright.page_wrapper import HealablePage
+
         assert isinstance(healable, HealablePage)
         assert healable.test_id == "tests/test_x.py::test_z"
 

@@ -18,7 +18,6 @@ from playwright.sync_api import sync_playwright
 from breadcrumb.core.storage import FingerprintStore
 from breadcrumb.playwright.page_wrapper import HealablePage, heal
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -101,9 +100,7 @@ class TestFingerprintSaving:
         assert fp is not None
         assert "sign in" in fp.text
 
-    def test_fingerprint_persists_across_healer_instances(
-        self, page, v1_url, db_path
-    ):
+    def test_fingerprint_persists_across_healer_instances(self, page, v1_url, db_path):
         """Fingerprint written by one Healer is readable by another."""
         hp1 = _make_healed(page, db_path, "test_persist")
         page.goto(v1_url)
@@ -182,11 +179,13 @@ class TestHealing:
         assert len(events) >= 1
 
     def test_no_healing_without_stored_fingerprint(self, page, v2_url, db_path):
-        """No stored fingerprint — should raise original error."""
+        """No stored fingerprint — should raise original Playwright error."""
+        from playwright.sync_api import Error as PlaywrightError
+
         hp = _make_healed(page, db_path, "test_no_fp")
         page.goto(v2_url)
 
-        with pytest.raises(Exception):
+        with pytest.raises(PlaywrightError):
             hp.locator("#login-btn").click()
 
     def test_stable_selector_does_not_heal(self, page, v1_url, v2_url, db_path):

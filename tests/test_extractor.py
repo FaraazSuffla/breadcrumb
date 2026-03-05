@@ -5,8 +5,6 @@ from __future__ import annotations
 import asyncio
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
-
 from breadcrumb.core.fingerprint import BoundingBox
 from breadcrumb.playwright.extractor import (
     _EXTRACT_ALL_JS,
@@ -16,7 +14,6 @@ from breadcrumb.playwright.extractor import (
     extract_fingerprint,
     extract_fingerprint_sync,
 )
-
 
 # ---------------------------------------------------------------------------
 # Shared raw data helpers
@@ -304,6 +301,7 @@ class TestExtractFingerprintAsync:
 class TestExtractAllCandidatesAsync:
     def test_async_returns_list_of_fingerprints(self) -> None:
         from breadcrumb.playwright.extractor import extract_all_candidates
+
         page = MagicMock()
         page.evaluate = AsyncMock(return_value=[_RAW_BUTTON, _RAW_INPUT])
 
@@ -318,6 +316,7 @@ class TestExtractAllCandidatesAsync:
 
     def test_async_returns_empty_list(self) -> None:
         from breadcrumb.playwright.extractor import extract_all_candidates
+
         page = MagicMock()
         page.evaluate = AsyncMock(return_value=[])
 
