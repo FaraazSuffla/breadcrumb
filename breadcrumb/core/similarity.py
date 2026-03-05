@@ -85,7 +85,7 @@ def jaccard_similarity(
     intersection = len(set_a & set_b)
     union = len(set_a | set_b)
 
-    if union == 0:
+    if union == 0:  # pragma: no cover  — unreachable: both-empty caught above
         return 0.0
 
     return intersection / union
@@ -121,7 +121,7 @@ def dom_path_similarity(a: tuple[str, ...], b: tuple[str, ...]) -> float:
         return 0.0
 
     max_len = max(len(a), len(b))
-    if max_len == 0:
+    if max_len == 0:  # pragma: no cover  — unreachable: both-empty caught above
         return 0.0
 
     return lcs_length(a, b) / max_len
@@ -133,7 +133,7 @@ def sibling_similarity(a: tuple[str, ...], b: tuple[str, ...]) -> float:
         return 0.0
 
     max_len = max(len(a), len(b))
-    if max_len == 0:
+    if max_len == 0:  # pragma: no cover  — unreachable: both-empty caught above
         return 0.0
 
     return lcs_length(a, b) / max_len

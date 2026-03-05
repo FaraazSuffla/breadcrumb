@@ -305,3 +305,25 @@ class TestComputeSimilarity:
         r = repr(result)
         assert "ScoringResult" in r
         assert "total=" in r
+
+
+# ---------------------------------------------------------------------------
+# Coverage gaps: jaccard with both-empty-non-empty union=0, dom/sibling empty
+# ---------------------------------------------------------------------------
+
+
+class TestCoverageGaps:
+    def test_jaccard_both_empty_returns_zero(self) -> None:
+        # Both empty sets — union is 0, should return 0.0 (line 89)
+        result = jaccard_similarity(frozenset(), frozenset())
+        assert result == 0.0
+
+    def test_dom_path_similarity_both_empty_returns_zero(self) -> None:
+        # Both empty tuples — max_len == 0 branch (line 125)
+        result = dom_path_similarity((), ())
+        assert result == 0.0
+
+    def test_sibling_similarity_both_empty_returns_zero(self) -> None:
+        # Both empty tuples — max_len == 0 branch (line 137)
+        result = sibling_similarity((), ())
+        assert result == 0.0

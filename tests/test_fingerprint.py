@@ -170,3 +170,39 @@ class TestSerialization:
         assert fp.attributes == frozenset()
         assert fp.dom_path == ()
         assert fp.siblings == ()
+
+
+# ---------------------------------------------------------------------------
+# Coverage gaps: from_dict with BoundingBox instance and frozenset attrs
+# ---------------------------------------------------------------------------
+
+
+class TestFromDictCoverageGaps:
+    def test_from_dict_with_bounding_box_instance(self) -> None:
+        # Pass a BoundingBox object directly (line 93 branch)
+        bbox = BoundingBox(x=10, y=20, width=50, height=30)
+        data = {
+            "tag": "button",
+            "text": "click",
+            "attributes": frozenset({("id", "btn")}),
+            "dom_path": ("html", "body", "button"),
+            "siblings": (),
+            "bbox": bbox,
+            "locator": "#btn",
+            "test_id": "t1",
+        }
+        fp = ElementFingerprint.from_dict(data)
+        assert fp.bbox is bbox
+
+    def test_from_dict_with_frozenset_attrs(self) -> None:
+        # Pass attributes as frozenset directly (line 108 branch)
+        attrs = frozenset({("class", "btn"), ("type", "submit")})
+        data = {
+            "tag": "button",
+            "text": "submit",
+            "attributes": attrs,
+            "dom_path": (),
+            "siblings": (),
+        }
+        fp = ElementFingerprint.from_dict(data)
+        assert fp.attributes == attrs

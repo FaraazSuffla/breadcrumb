@@ -37,13 +37,15 @@ def mock_page() -> MagicMock:
 
 
 @pytest.fixture
-def store(tmp_path: Path) -> FingerprintStore:
+def store(tmp_path: Path):
     """A real FingerprintStore with a temp database."""
-    return FingerprintStore(tmp_path / "test.db")
+    s = FingerprintStore(tmp_path / "test.db")
+    yield s
+    s.close()
 
 
 @pytest.fixture
-def healer(store: FingerprintStore) -> Healer:
+def healer(store: FingerprintStore) -> Healer:  # type: ignore[override]
     """A real Healer backed by the temp store."""
     return Healer(store=store, threshold=0.5)
 
@@ -462,3 +464,276 @@ class TestLocatorNavigation:
         loc.locator.bounding_box.return_value = {"x": 0, "y": 0, "w": 10, "h": 10}
         result = loc.bounding_box()
         assert result == {"x": 0, "y": 0, "w": 10, "h": 10}
+
+
+# ---------------------------------------------------------------------------
+# Coverage gap: selector building — name attribute branch
+# ---------------------------------------------------------------------------
+
+
+class TestSelectorBuildingNameBranch:
+    def _make_loc(self, page: HealablePage) -> HealableLocator:
+        return HealableLocator(locator=MagicMock(), selector="#test", page=page)
+
+    def test_falls_back_to_name_attribute(self, healable_page: HealablePage) -> None:
+        loc = self._make_loc(healable_page)
+        fp = ElementFingerprint(
+            tag="input",
+            text="",
+            attributes=frozenset({("name", "username")}),
+            dom_path=(),
+            siblings=(),
+        )
+        selector = loc._build_healed_selector(fp)
+        assert selector == 'input[name="username"]'
+
+
+# ---------------------------------------------------------------------------
+# Coverage gap: remaining action proxy methods
+# ---------------------------------------------------------------------------
+
+
+class TestRemainingActions:
+    def _fp(self, tag: str = "button", locator: str = "#btn") -> ElementFingerprint:
+        return ElementFingerprint(
+            tag=tag, text="", attributes=frozenset(), dom_path=(), siblings=(),
+            locator=locator, test_id="test_login",
+        )
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_dblclick(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp()
+        loc = healable_page.locator("#btn")
+        loc.dblclick()
+        loc.locator.dblclick.assert_called_once()
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_type(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("input", "#inp")
+        loc = healable_page.locator("#inp")
+        loc.type("hello")
+        loc.locator.type.assert_called_once_with("hello")
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_press(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("input", "#inp")
+        loc = healable_page.locator("#inp")
+        loc.press("Enter")
+        loc.locator.press.assert_called_once_with("Enter")
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_check(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("input", "#chk")
+        loc = healable_page.locator("#chk")
+        loc.check()
+        loc.locator.check.assert_called_once()
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_uncheck(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("input", "#chk")
+        loc = healable_page.locator("#chk")
+        loc.uncheck()
+        loc.locator.uncheck.assert_called_once()
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_hover(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("div", "#d")
+        loc = healable_page.locator("#d")
+        loc.hover()
+        loc.locator.hover.assert_called_once()
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_focus(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("input", "#inp")
+        loc = healable_page.locator("#inp")
+        loc.focus()
+        loc.locator.focus.assert_called_once()
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_scroll_into_view_if_needed(
+        self, mock_extract: MagicMock, healable_page: HealablePage
+    ) -> None:
+        mock_extract.return_value = self._fp("div", "#d")
+        loc = healable_page.locator("#d")
+        loc.scroll_into_view_if_needed()
+        loc.locator.scroll_into_view_if_needed.assert_called_once()
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_input_value(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("input", "#inp")
+        healable_page.page.locator.return_value.input_value.return_value = "test@example.com"
+        loc = healable_page.locator("#inp")
+        assert loc.input_value() == "test@example.com"
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_inner_text(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("p", "#p")
+        healable_page.page.locator.return_value.inner_text.return_value = "hello"
+        loc = healable_page.locator("#p")
+        assert loc.inner_text() == "hello"
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_inner_html(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("div", "#d")
+        healable_page.page.locator.return_value.inner_html.return_value = "<span>hi</span>"
+        loc = healable_page.locator("#d")
+        assert loc.inner_html() == "<span>hi</span>"
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_text_content(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("p", "#p")
+        healable_page.page.locator.return_value.text_content.return_value = "content"
+        loc = healable_page.locator("#p")
+        assert loc.text_content() == "content"
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_get_attribute(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("a", "#a")
+        healable_page.page.locator.return_value.get_attribute.return_value = "/path"
+        loc = healable_page.locator("#a")
+        assert loc.get_attribute("href") == "/path"
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_is_visible(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("div", "#d")
+        healable_page.page.locator.return_value.is_visible.return_value = True
+        loc = healable_page.locator("#d")
+        assert loc.is_visible() is True
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_is_enabled(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp()
+        healable_page.page.locator.return_value.is_enabled.return_value = True
+        loc = healable_page.locator("#btn")
+        assert loc.is_enabled() is True
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_is_checked(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("input", "#chk")
+        healable_page.page.locator.return_value.is_checked.return_value = False
+        loc = healable_page.locator("#chk")
+        assert loc.is_checked() is False
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    def test_select_option(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
+        mock_extract.return_value = self._fp("select", "#sel")
+        healable_page.page.locator.return_value.select_option.return_value = ["opt1"]
+        loc = healable_page.locator("#sel")
+        assert loc.select_option("opt1") == ["opt1"]
+
+
+# ---------------------------------------------------------------------------
+# Coverage gap: healed selector also fails → raises original error
+# ---------------------------------------------------------------------------
+
+
+class TestHealedActionFails:
+    def _make_fp(self, **overrides: Any) -> ElementFingerprint:
+        defaults: dict[str, Any] = {
+            "tag": "button",
+            "text": "submit",
+            "attributes": frozenset({("id", "submit-btn"), ("class", "btn")}),
+            "dom_path": ("html", "body", "form", "button"),
+            "siblings": ("input",),
+            "locator": "#submit-btn",
+            "test_id": "test_login",
+        }
+        defaults.update(overrides)
+        return ElementFingerprint(**defaults)
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    @patch("breadcrumb.playwright.page_wrapper.extract_all_candidates_sync")
+    def test_raises_original_when_healed_selector_also_fails(
+        self,
+        mock_candidates: MagicMock,
+        mock_extract: MagicMock,
+        healable_page: HealablePage,
+    ) -> None:
+        stored_fp = self._make_fp()
+        healable_page.healer.save(stored_fp)
+
+        original_locator = MagicMock()
+        original_error = Exception("original locator broken")
+        original_locator.click.side_effect = original_error
+
+        candidate_fp = self._make_fp(
+            attributes=frozenset({("id", "submit-btn-v2"), ("class", "btn")})
+        )
+        mock_candidates.return_value = [candidate_fp]
+
+        healed_locator = MagicMock()
+        healed_locator.click.side_effect = Exception("healed locator also broken")
+        healable_page.page.locator.side_effect = [original_locator, healed_locator]
+
+        mock_extract.return_value = candidate_fp
+
+        loc = HealableLocator(
+            locator=original_locator,
+            selector="#submit-btn",
+            page=healable_page,
+        )
+        with pytest.raises(Exception, match="original locator broken"):
+            loc.click()
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_all_candidates_sync")
+    def test_raises_when_candidate_extraction_fails(
+        self,
+        mock_candidates: MagicMock,
+        healable_page: HealablePage,
+    ) -> None:
+        """Cover lines 229-231: extraction raises during healing."""
+        stored_fp = self._make_fp()
+        healable_page.healer.save(stored_fp)
+
+        original_locator = MagicMock()
+        original_locator.click.side_effect = Exception("locator broken")
+        healable_page.page.locator.return_value = original_locator
+
+        # Candidate extraction itself fails
+        mock_candidates.side_effect = RuntimeError("page crashed")
+
+        loc = HealableLocator(
+            locator=original_locator,
+            selector="#submit-btn",
+            page=healable_page,
+        )
+        with pytest.raises(Exception, match="locator broken"):
+            loc.click()
+
+    @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
+    @patch("breadcrumb.playwright.page_wrapper.extract_all_candidates_sync")
+    def test_healed_fingerprint_save_failure_is_swallowed(
+        self,
+        mock_candidates: MagicMock,
+        mock_extract: MagicMock,
+        healable_page: HealablePage,
+    ) -> None:
+        """Cover lines 346-347: fingerprint save after successful heal raises."""
+        stored_fp = self._make_fp()
+        healable_page.healer.save(stored_fp)
+
+        original_locator = MagicMock()
+        original_locator.click.side_effect = Exception("locator broken")
+
+        candidate_fp = self._make_fp(
+            attributes=frozenset({("id", "submit-btn-v2"), ("class", "btn")})
+        )
+        mock_candidates.return_value = [candidate_fp]
+
+        # Healed locator succeeds on click
+        healed_locator = MagicMock()
+        healed_locator.click.return_value = None
+        # page.locator() is only called once (for the healed selector)
+        healable_page.page.locator.return_value = healed_locator
+
+        # Fingerprint extraction after heal raises — should be swallowed (lines 346-347)
+        mock_extract.side_effect = RuntimeError("extraction failed post-heal")
+
+        loc = HealableLocator(
+            locator=original_locator,
+            selector="#submit-btn",
+            page=healable_page,
+        )
+        # Should NOT raise — the save failure is silently logged
+        loc.click()
+        healed_locator.click.assert_called_once()
