@@ -35,3 +35,6 @@ Thumbs.db
 
 # Docs
 site/
+
+# Claude Code
+.claude/
