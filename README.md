@@ -18,7 +18,7 @@
     &middot;
     <a href="#how-it-works"><strong>How It Works</strong></a>
     &middot;
-    <a href="#planned-features"><strong>Features</strong></a>
+    <a href="#features"><strong>Features</strong></a>
     &middot;
     <a href="#roadmap"><strong>Roadmap</strong></a>
     &middot;
@@ -27,9 +27,9 @@
     <a href="#contributing"><strong>Contributing</strong></a>
 </p>
 
-> **⚠️ Pre-Alpha — Under Active Development**
+> **⚠️ Pre-Alpha — Core Engine Working**
 >
-> Breadcrumb is not yet functional. This README describes the intended design and API. Star/watch the repo to follow progress. Contributions welcome.
+> Phases 1 and 2 are complete: fingerprinting, similarity scoring, SQLite storage, Playwright wrapper, and pytest plugin all work. Reporting (Phase 3), CLI (Phase 4), and AI generation (Phase 5) are next. Star/watch the repo to follow progress. Contributions welcome.
 
 ---
 
@@ -57,11 +57,10 @@ Fingerprint:
   id:         login-btn
   classes:    [btn, primary]
   text:       Sign In
-  attributes: {data-testid: auth}
-  xpath:      /html/body/div[2]/form/button[1]
-  css_path:   body > div:nth-child(2) > form > button
-  siblings:   [input.email, input.password]
-  position:   {x: 450, y: 320}
+  attributes: {data-testid: auth, class: btn primary, id: login-btn}
+  siblings:   [input, label]
+  dom_path:   [html, body, form, button]
+  position:   {x: 450, y: 320, width: 120, height: 40}
 ```
 Each signal carries a different weight. An `id` match is strong evidence; a positional match alone is weak. The combination is what makes healing reliable.
 
@@ -75,11 +74,11 @@ When a locator fails, Breadcrumb scans all visible elements and scores each one 
 | Text        | Levenshtein distance         | High   | "Sign In" → "Log In" is still a match |
 | Classes     | Jaccard similarity           | Medium | Classes shuffle but overlap            |
 | Attributes  | Jaccard similarity           | Medium | data-testid often survives refactors   |
-| XPath       | Longest Common Subsequence   | Low    | Structural hint, not a guarantee       |
-| Siblings    | Structural similarity        | Low    | Nearby elements provide context        |
+| DOM path    | Longest Common Subsequence   | Low    | Structural hint, not a guarantee       |
+| Siblings    | LCS similarity               | Low    | Nearby elements provide context        |
 | Position    | Euclidean distance           | Low    | Layout shifts happen often             |
 
-The element with the highest composite score above a configurable threshold (default: 0.75) is selected as the healed match. Below the threshold, the test fails normally — Breadcrumb never silently picks a wrong element.
+The element with the highest composite score above a configurable threshold (default: 0.5) is selected as the healed match. Below the threshold, the test fails normally — Breadcrumb never silently picks a wrong element.
 
 ### Layer 3 — Storage
 Fingerprints live in a local SQLite database (`.breadcrumb.db`), created automatically on first run. Zero servers, zero config. Schema migrations are handled internally so the DB format can evolve across versions without breaking your data.
@@ -87,9 +86,7 @@ Fingerprints live in a local SQLite database (`.breadcrumb.db`), created automat
 ### Layer 4 — Reporting & Intelligence
 Every heal event is logged: what locator broke, what element was selected, confidence score, and timestamp. This data powers flakiness reports, confidence trend analysis, and an optional quarantine system that sidelines chronically unstable tests.
 
-## Planned API Preview
-
-> **These code examples show the intended API. None of this is implemented yet.**
+## Quick Start
 
 ### Basic Usage — Wrap and Forget
 ```python
@@ -106,106 +103,101 @@ with sync_playwright() as p:
     page.locator("#login-btn").click()                          # Next run: healed automatically ✅
 ```
 
-### pytest Integration
+### pytest Plugin — Built-in Fixture
+
+Enable the plugin with `--breadcrumb` and use the `heal_page` fixture:
+
 ```python
-# conftest.py
-import pytest
-from breadcrumb import crumb
+# pytest.ini / pyproject.toml
+# (no conftest changes needed)
 
-@pytest.fixture
-def page(page):
-    return crumb(page)
-
-# test_login.py — writes exactly like normal Playwright tests
-def test_login(page):
-    page.goto("https://myapp.com")
-    page.locator("#login-btn").click()                          # Self-healing, zero extra syntax
-    assert page.locator(".welcome").is_visible()
+# test_login.py
+def test_login(heal_page):
+    heal_page.goto("https://myapp.com")
+    heal_page.locator("#login-btn").click()     # Self-healing, zero extra syntax
+    assert heal_page.locator(".welcome").is_visible()
 ```
 
-### Healing Report
+```bash
+pytest --breadcrumb --breadcrumb-report
+# Breadcrumb healing summary printed at the end of the run
+```
+
+### Healing Report _(Phase 3 — Planned)_
 ```python
 from breadcrumb.report import HealingReport
 
 report = HealingReport.from_db()
 report.print_summary()
-# ┌─────────────────────────────────────────────────┐
-# │ Breadcrumb Healing Report                       │
-# ├────────────┬──────────┬────────────┬────────────┤
-# │ Test       │ Heals    │ Avg Conf.  │ Status     │
-# ├────────────┼──────────┼────────────┼────────────┤
-# │ test_login │ 3        │ 94.2%      │ ✅ Stable  │
-# │ test_cart  │ 12       │ 67.1%      │ ⚠️ Flaky   │
-# │ test_pay   │ 0        │ —          │ ✅ Solid   │
-# └────────────┴──────────┴────────────┴────────────┘
-
 report.export_html("healing_report.html")
-report.export_json("healing_data.json")
 ```
 
-### CLI
+### CLI _(Phase 4 — Planned)_
 ```bash
-breadcrumb init                          # Initialize project config
 breadcrumb report                        # Print healing summary
-breadcrumb report --html report.html     # Export HTML dashboard
 breadcrumb doctor                        # Diagnose DB health and stale fingerprints
 breadcrumb generate https://myapp.com    # AI-generate test skeletons (requires Ollama)
 ```
 
-## Planned Features
+## Features
 
-### Self-Healing Core
+### Self-Healing Core ✅ _Working_
 - 🔄 **Automatic Element Recovery** — When locators break, Breadcrumb finds the right element using multi-signal fingerprinting.
-- 🧬 **Multi-Signal Fingerprinting** — Captures tag, id, classes, text, attributes, XPath, CSS path, sibling context, and visual position.
+- 🧬 **Multi-Signal Fingerprinting** — Captures tag, id, classes, text, attributes, DOM path, sibling context, and visual position.
 - 📊 **Weighted Similarity Scoring** — Combines Jaccard, Levenshtein, and LCS with configurable weights.
-- 🗄️ **Zero-Infrastructure Storage** — Local SQLite. No servers, no cloud, no API keys.
+- 🗄️ **Zero-Infrastructure Storage** — Local SQLite (WAL mode). No servers, no cloud, no API keys.
 
-### Flaky Test Intelligence
-- 📈 **Failure Tracking** — Every heal recorded with confidence scores and DOM context.
+### Playwright + pytest Integration ✅ _Working_
+- 🧩 **Playwright Wrapper** — `heal(page)` wraps any Playwright `Page` transparently.
+- 🔌 **pytest Plugin** — `heal_page` fixture, `--breadcrumb` flag, per-session healing summary.
+- 📈 **Heal Event Log** — Every heal recorded with locator, confidence score, and timestamp.
+
+### Flaky Test Intelligence ⬜ _Planned (Phase 3)_
 - 🏥 **Quarantine Mode** — Auto-quarantine chronically flaky tests, unquarantine when stable.
 - 📋 **Trend Analysis** — Healing frequency, confidence drift, and element stability over time.
+- 📊 **HTML Dashboard** — Visual report of heals, confidence, and flakiness.
 
-### AI-Powered Test Generation (Optional)
+### AI-Powered Test Generation ⬜ _Planned (Phase 5)_
 - 🤖 **Local LLM via Ollama** — AI-assisted test generation running entirely on your machine.
 - 🕸️ **Page Crawling** — Discover interactive elements and generate test skeletons.
-- 🧪 **Smart Assertions** — AI suggests assertions based on page structure.
 
 ### Developer Experience
-- 🧩 **pytest Plugin** — One-line fixture wrapper, every test becomes self-healing.
-- 💻 **CLI** — `init`, `report`, `doctor`, `generate` commands.
-- 📊 **HTML Dashboard** — Visual report of heals, confidence, and flakiness.
-- 📘 **Full Type Coverage** — pyright strict + mypy strict on every commit.
-- 🔋 **Zero Config** — Sensible defaults. Override via `breadcrumb.toml` or `pyproject.toml`.
+- 📘 **Full Type Coverage** — pyright + mypy on every commit.
+- 🔋 **Zero Config** — Sensible defaults. Override via `pyproject.toml`.
+- 💻 **CLI** ⬜ — `report`, `doctor`, `generate` commands _(Phase 4)_.
 
 ## Roadmap
 
 | Phase | Focus                    | Status         |
 |-------|--------------------------|----------------|
-| 1     | Fingerprint engine + SQLite storage + similarity scoring | 🔜 Up next |
-| 2     | Playwright page wrapper + pytest plugin + basic healing | ⬜ Planned |
+| 1     | Fingerprint engine + SQLite storage + similarity scoring | ✅ Complete |
+| 2     | Playwright page wrapper + pytest plugin + basic healing | ✅ Complete |
 | 3     | Flaky test tracker + quarantine + reporting (console, HTML, JSON) | ⬜ Planned |
-| 4     | CLI (`init`, `report`, `doctor`) + configuration system | ⬜ Planned |
+| 4     | CLI (`report`, `doctor`) + configuration system | ⬜ Planned |
 | 5     | AI test generation via Ollama + page crawler | ⬜ Planned |
 
-## Benchmark Strategy
+## Benchmarks
 
-Benchmarks will be published once Phase 1 is complete. The planned benchmark suite will measure:
+Measured on an i7-class machine with Python 3.12. See [`benchmarks/`](https://github.com/FaraazSuffla/breadcrumb/tree/main/benchmarks) for reproducible scripts.
 
-- **Healing speed** — Time to scan N candidate elements and find the best match
-- **Healing accuracy** — Recovery rate across synthetic DOM mutation types (ID rename, class change, element relocation, parent restructure, multi-signal changes)
-- **Overhead** — Added latency per test interaction vs raw Playwright
-- **Storage** — DB size growth over test suite lifetime
+| Benchmark                         | Result       |
+|-----------------------------------|--------------|
+| Single-pair similarity score      | ~0.009 ms    |
+| Heal over 100 candidates          | ~2 ms        |
+| Heal over 1 000 candidates        | ~14 ms       |
+| Fingerprint INSERT (SQLite WAL)   | ~0.29 ms/op  |
+| Fingerprint SELECT by key         | ~0.006 ms/op |
 
-All benchmarks will be reproducible via scripts in [`benchmarks/`](https://github.com/FaraazSuffla/breadcrumb/tree/main/benchmarks).
+Healing a typical page (30–100 interactive elements) adds **under 15 ms** per broken locator — imperceptible in a test suite.
 
 ## Installation
 
-> **Not yet published to PyPI.** For now, install from source:
+> **Not yet published to PyPI.** Install from source:
 
 ```bash
 git clone https://github.com/FaraazSuffla/breadcrumb.git
 cd breadcrumb
-pip install -e "."
+pip install -e ".[dev]"      # includes pytest, playwright, ruff, pyright, mypy
 playwright install chromium
 ```
 
@@ -214,9 +206,9 @@ Breadcrumb requires **Python 3.10+**.
 ### Optional Dependencies
 
 ```bash
-pip install -e ".[ai]"       # Ollama integration for AI test generation
-pip install -e ".[dev]"      # pytest, ruff, pyright, mypy, pre-commit
-pip install -e ".[docs]"     # MkDocs + Material theme
+pip install -e ".[playwright]"  # Playwright only (no dev tools)
+pip install -e ".[ai]"          # Ollama integration for AI test generation (Phase 5)
+pip install -e ".[docs]"        # MkDocs + Material theme
 ```
 
 ## Tech Stack
