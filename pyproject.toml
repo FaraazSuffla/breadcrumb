@@ -118,6 +118,9 @@ ignore_errors = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: end-to-end tests requiring Playwright + Chromium (run with --integration)",
+]
 
 [tool.coverage.run]
 source = ["breadcrumb"]

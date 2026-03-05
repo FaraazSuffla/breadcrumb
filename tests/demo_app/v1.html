@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Breadcrumb Demo — v1</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .card { border: 1px solid #ddd; padding: 16px; margin: 12px 0; border-radius: 4px; }
+        input { padding: 6px; border: 1px solid #ccc; border-radius: 3px; width: 100%; box-sizing: border-box; }
+        label { display: block; margin-bottom: 4px; font-weight: bold; }
+        .form-group { margin-bottom: 12px; }
+        nav a { margin-right: 12px; text-decoration: none; color: #007bff; }
+        .alert { background: #fff3cd; border: 1px solid #ffc107; padding: 12px; border-radius: 4px; }
+        .status { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav id="main-nav">
+        <a href="#" id="nav-home">Home</a>
+        <a href="#" id="nav-about">About</a>
+        <a href="#" id="nav-contact">Contact</a>
+    </nav>
+
+    <h1 id="page-title">Welcome to the Demo App</h1>
+    <p class="status" id="status-message">Version 1</p>
+
+    <div class="alert" id="info-banner">
+        <strong>Notice:</strong> This is the v1 layout used for fingerprinting.
+    </div>
+
+    <!-- Login form -->
+    <section id="login-section" class="card">
+        <h2>Sign In</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email-input">Email</label>
+                <input
+                    type="email"
+                    id="email-input"
+                    class="form-control"
+                    placeholder="Enter your email"
+                    data-testid="email-field"
+                />
+            </div>
+            <div class="form-group">
+                <label for="password-input">Password</label>
+                <input
+                    type="password"
+                    id="password-input"
+                    class="form-control"
+                    placeholder="Enter your password"
+                    data-testid="password-field"
+                />
+            </div>
+            <button
+                type="submit"
+                id="login-btn"
+                class="btn btn-primary"
+                data-testid="login-submit"
+            >
+                Sign In
+            </button>
+        </form>
+    </section>
+
+    <!-- Product cards -->
+    <section id="products-section">
+        <h2>Products</h2>
+        <div class="card" id="product-1">
+            <h3 class="product-title">Widget Alpha</h3>
+            <p class="product-description">A reliable widget for all your needs.</p>
+            <button class="btn btn-primary add-to-cart" id="add-to-cart-1" data-product="1">
+                Add to Cart
+            </button>
+        </div>
+        <div class="card" id="product-2">
+            <h3 class="product-title">Widget Beta</h3>
+            <p class="product-description">An advanced widget with extra features.</p>
+            <button class="btn btn-primary add-to-cart" id="add-to-cart-2" data-product="2">
+                Add to Cart
+            </button>
+        </div>
+    </section>
+
+    <!-- Search -->
+    <section id="search-section" class="card">
+        <h2>Search</h2>
+        <div style="display:flex; gap:8px;">
+            <input
+                type="text"
+                id="search-input"
+                class="form-control"
+                placeholder="Search products..."
+                data-testid="search-box"
+            />
+            <button id="search-btn" class="btn btn-primary" data-testid="search-submit">
+                Search
+            </button>
+        </div>
+    </section>
+
+    <!-- Subscription -->
+    <section id="subscribe-section" class="card">
+        <h2>Subscribe</h2>
+        <label for="subscribe-email">Newsletter email</label>
+        <input
+            type="email"
+            id="subscribe-email"
+            class="form-control"
+            placeholder="your@email.com"
+            data-testid="subscribe-email"
+        />
+        <br><br>
+        <label>
+            <input type="checkbox" id="subscribe-terms" data-testid="terms-checkbox" />
+            I agree to the terms
+        </label>
+        <br><br>
+        <button id="subscribe-btn" class="btn btn-primary" data-testid="subscribe-submit">
+            Subscribe
+        </button>
+    </section>
+
+    <!-- Footer -->
+    <footer id="page-footer" style="margin-top:40px; color:#666; font-size:0.9em;">
+        <a href="#" id="footer-privacy">Privacy Policy</a> |
+        <a href="#" id="footer-terms">Terms of Service</a>
+    </footer>
+</body>
+</html>

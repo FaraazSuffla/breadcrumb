@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Breadcrumb Demo — v2 (refactored)</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .button-main { background: #0056b3; color: white; }
+        .panel { border: 1px solid #ddd; padding: 16px; margin: 12px 0; border-radius: 4px; }
+        input { padding: 6px; border: 1px solid #ccc; border-radius: 3px; width: 100%; box-sizing: border-box; }
+        label { display: block; margin-bottom: 4px; font-weight: bold; }
+        .input-group { margin-bottom: 12px; }
+        nav a { margin-right: 12px; text-decoration: none; color: #0056b3; }
+        .notice { background: #d1ecf1; border: 1px solid #bee5eb; padding: 12px; border-radius: 4px; }
+        .version { color: #0056b3; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <!--
+        v2 changes (simulating a realistic frontend refactor):
+        - Renamed IDs: #login-btn -> #auth-button, #email-input -> #user-email,
+                       #password-input -> #user-password, #search-btn -> #find-btn,
+                       #subscribe-btn -> #newsletter-btn
+        - Renamed classes: .btn -> .button, .btn-primary -> .button-main,
+                           .form-control -> .field-input, .card -> .panel
+        - Text changes: "Sign In" -> "Log In", "Search" -> "Find", "Subscribe" -> "Join"
+        - data-testid attributes preserved (intentionally stable)
+        - Nav IDs removed (replaced with class-based)
+        - Product IDs preserved
+    -->
+
+    <nav id="site-nav">
+        <a href="#" class="nav-link nav-home">Home</a>
+        <a href="#" class="nav-link nav-about">About</a>
+        <a href="#" class="nav-link nav-contact">Contact</a>
+    </nav>
+
+    <h1 id="page-title">Welcome to the Demo App</h1>
+    <p class="version" id="status-message">Version 2</p>
+
+    <div class="notice" id="info-banner">
+        <strong>Notice:</strong> This is the v2 refactored layout.
+    </div>
+
+    <!-- Login form — IDs renamed, classes renamed, text changed -->
+    <section id="auth-section" class="panel">
+        <h2>Log In</h2>
+        <form id="auth-form">
+            <div class="input-group">
+                <label for="user-email">Email</label>
+                <input
+                    type="email"
+                    id="user-email"
+                    class="field-input"
+                    placeholder="Enter your email"
+                    data-testid="email-field"
+                />
+            </div>
+            <div class="input-group">
+                <label for="user-password">Password</label>
+                <input
+                    type="password"
+                    id="user-password"
+                    class="field-input"
+                    placeholder="Enter your password"
+                    data-testid="password-field"
+                />
+            </div>
+            <button
+                type="submit"
+                id="auth-button"
+                class="button button-main"
+                data-testid="login-submit"
+            >
+                Log In
+            </button>
+        </form>
+    </section>
+
+    <!-- Product cards — IDs preserved, classes renamed -->
+    <section id="products-section">
+        <h2>Products</h2>
+        <div class="panel" id="product-1">
+            <h3 class="item-title">Widget Alpha</h3>
+            <p class="item-description">A reliable widget for all your needs.</p>
+            <button class="button button-main add-item" id="add-to-cart-1" data-product="1">
+                Add to Cart
+            </button>
+        </div>
+        <div class="panel" id="product-2">
+            <h3 class="item-title">Widget Beta</h3>
+            <p class="item-description">An advanced widget with extra features.</p>
+            <button class="button button-main add-item" id="add-to-cart-2" data-product="2">
+                Add to Cart
+            </button>
+        </div>
+    </section>
+
+    <!-- Search — ID renamed, text changed -->
+    <section id="search-section" class="panel">
+        <h2>Find Products</h2>
+        <div style="display:flex; gap:8px;">
+            <input
+                type="text"
+                id="query-input"
+                class="field-input"
+                placeholder="Search products..."
+                data-testid="search-box"
+            />
+            <button id="find-btn" class="button button-main" data-testid="search-submit">
+                Find
+            </button>
+        </div>
+    </section>
+
+    <!-- Subscription — IDs renamed, text changed -->
+    <section id="newsletter-section" class="panel">
+        <h2>Join Our Newsletter</h2>
+        <label for="newsletter-email">Your email address</label>
+        <input
+            type="email"
+            id="newsletter-email"
+            class="field-input"
+            placeholder="your@email.com"
+            data-testid="subscribe-email"
+        />
+        <br><br>
+        <label>
+            <input type="checkbox" id="agree-terms" data-testid="terms-checkbox" />
+            I agree to the terms and conditions
+        </label>
+        <br><br>
+        <button id="newsletter-btn" class="button button-main" data-testid="subscribe-submit">
+            Join
+        </button>
+    </section>
+
+    <!-- Footer — IDs renamed -->
+    <footer id="site-footer" style="margin-top:40px; color:#666; font-size:0.9em;">
+        <a href="#" id="link-privacy">Privacy Policy</a> |
+        <a href="#" id="link-terms">Terms of Service</a>
+    </footer>
+</body>
+</html>
