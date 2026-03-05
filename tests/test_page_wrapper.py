@@ -17,7 +17,6 @@ from breadcrumb.playwright.page_wrapper import (
     heal,
 )
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -496,8 +495,13 @@ class TestSelectorBuildingNameBranch:
 class TestRemainingActions:
     def _fp(self, tag: str = "button", locator: str = "#btn") -> ElementFingerprint:
         return ElementFingerprint(
-            tag=tag, text="", attributes=frozenset(), dom_path=(), siblings=(),
-            locator=locator, test_id="test_login",
+            tag=tag,
+            text="",
+            attributes=frozenset(),
+            dom_path=(),
+            siblings=(),
+            locator=locator,
+            test_id="test_login",
         )
 
     @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
@@ -550,9 +554,7 @@ class TestRemainingActions:
         loc.locator.focus.assert_called_once()
 
     @patch("breadcrumb.playwright.page_wrapper.extract_fingerprint_sync")
-    def test_scroll_into_view_if_needed(
-        self, mock_extract: MagicMock, healable_page: HealablePage
-    ) -> None:
+    def test_scroll_into_view_if_needed(self, mock_extract: MagicMock, healable_page: HealablePage) -> None:
         mock_extract.return_value = self._fp("div", "#d")
         loc = healable_page.locator("#d")
         loc.scroll_into_view_if_needed()
@@ -656,9 +658,7 @@ class TestHealedActionFails:
         original_error = Exception("original locator broken")
         original_locator.click.side_effect = original_error
 
-        candidate_fp = self._make_fp(
-            attributes=frozenset({("id", "submit-btn-v2"), ("class", "btn")})
-        )
+        candidate_fp = self._make_fp(attributes=frozenset({("id", "submit-btn-v2"), ("class", "btn")}))
         mock_candidates.return_value = [candidate_fp]
 
         healed_locator = MagicMock()
@@ -715,9 +715,7 @@ class TestHealedActionFails:
         original_locator = MagicMock()
         original_locator.click.side_effect = Exception("locator broken")
 
-        candidate_fp = self._make_fp(
-            attributes=frozenset({("id", "submit-btn-v2"), ("class", "btn")})
-        )
+        candidate_fp = self._make_fp(attributes=frozenset({("id", "submit-btn-v2"), ("class", "btn")}))
         mock_candidates.return_value = [candidate_fp]
 
         # Healed locator succeeds on click

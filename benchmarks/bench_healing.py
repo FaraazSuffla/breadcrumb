@@ -31,11 +31,13 @@ def _make_fp(
     return ElementFingerprint(
         tag=tag,
         text=text,
-        attributes=frozenset({
-            ("id", f"element-{i}"),
-            ("class", "btn primary"),
-            ("data-testid", f"elem-{i}"),
-        }),
+        attributes=frozenset(
+            {
+                ("id", f"element-{i}"),
+                ("class", "btn primary"),
+                ("data-testid", f"elem-{i}"),
+            }
+        ),
         dom_path=("html", "body", "div", "form", tag),
         siblings=("input", "label"),
         bbox=BoundingBox(x=float(i % 800), y=float(i * 5 % 600), width=80.0, height=40.0),
@@ -51,12 +53,14 @@ def _make_candidate_pool(n: int, match_index: int = 0) -> list[ElementFingerprin
         if i == match_index:
             candidates.append(_make_fp(tag="button", text="submit", i=i))
         else:
-            candidates.append(_make_fp(
-                tag="div" if i % 3 == 0 else "span",
-                text=f"noise element {i}",
-                i=i,
-                locator=f"#noise-{i}",
-            ))
+            candidates.append(
+                _make_fp(
+                    tag="div" if i % 3 == 0 else "span",
+                    text=f"noise element {i}",
+                    i=i,
+                    locator=f"#noise-{i}",
+                )
+            )
     return candidates
 
 

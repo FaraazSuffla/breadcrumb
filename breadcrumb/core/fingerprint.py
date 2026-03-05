@@ -113,9 +113,7 @@ class ElementFingerprint:
         dom_path = tuple(raw_dom) if not isinstance(raw_dom, tuple) else raw_dom
 
         raw_siblings = data.get("siblings", ())
-        siblings = (
-            tuple(raw_siblings) if not isinstance(raw_siblings, tuple) else raw_siblings
-        )
+        siblings = tuple(raw_siblings) if not isinstance(raw_siblings, tuple) else raw_siblings
 
         return cls(
             tag=cls._normalize_tag(data.get("tag", "")),

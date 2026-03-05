@@ -18,7 +18,6 @@ from breadcrumb.core.similarity import (
     text_similarity,
 )
 
-
 # ---------------------------------------------------------------------------
 # Tag similarity
 # ---------------------------------------------------------------------------
@@ -240,9 +239,7 @@ class TestComputeSimilarity:
         fp = self._make_fp()
         result = compute_similarity(fp, fp)
         assert result.total == pytest.approx(1.0, abs=0.01)
-        assert all(
-            v == pytest.approx(1.0, abs=0.01) for v in result.breakdown.values()
-        )
+        assert all(v == pytest.approx(1.0, abs=0.01) for v in result.breakdown.values())
 
     def test_completely_different(self) -> None:
         a = self._make_fp()

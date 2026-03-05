@@ -6,7 +6,6 @@ import pytest
 
 from breadcrumb.core.fingerprint import BoundingBox, ElementFingerprint
 
-
 # ---------------------------------------------------------------------------
 # BoundingBox
 # ---------------------------------------------------------------------------
@@ -141,13 +140,15 @@ class TestSerialization:
         assert restored.bbox.x == 10
 
     def test_from_dict_with_dict_attributes(self) -> None:
-        fp = ElementFingerprint.from_dict({
-            "tag": "input",
-            "text": "",
-            "attributes": {"type": "email", "name": "user"},
-            "dom_path": ["html", "body"],
-            "siblings": [],
-        })
+        fp = ElementFingerprint.from_dict(
+            {
+                "tag": "input",
+                "text": "",
+                "attributes": {"type": "email", "name": "user"},
+                "dom_path": ["html", "body"],
+                "siblings": [],
+            }
+        )
         assert ("type", "email") in fp.attributes
         assert ("name", "user") in fp.attributes
 
@@ -156,10 +157,12 @@ class TestSerialization:
         assert fp.bbox is None
 
     def test_from_dict_normalizes(self) -> None:
-        fp = ElementFingerprint.from_dict({
-            "tag": "BUTTON",
-            "text": "  Click Me  ",
-        })
+        fp = ElementFingerprint.from_dict(
+            {
+                "tag": "BUTTON",
+                "text": "  Click Me  ",
+            }
+        )
         assert fp.tag == "button"
         assert fp.text == "click me"
 

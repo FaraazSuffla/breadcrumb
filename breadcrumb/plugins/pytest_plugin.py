@@ -129,8 +129,7 @@ def pytest_terminal_summary(
         terminalreporter.write_line("  Recent healing events:")
         for event in events[:10]:
             terminalreporter.write_line(
-                f"    {event.test_id} | {event.locator} "
-                f"| confidence={event.confidence:.4f}",
+                f"    {event.test_id} | {event.locator} | confidence={event.confidence:.4f}",
             )
     else:
         terminalreporter.write_line("  No healing events recorded.")

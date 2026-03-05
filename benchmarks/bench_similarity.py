@@ -28,9 +28,7 @@ def _make_fp(
     locator: str = "#btn",
     test_id: str = "bench_test",
 ) -> ElementFingerprint:
-    attrs = frozenset(
-        (f"attr-{i}", f"value-{i}") for i in range(n_attrs)
-    )
+    attrs = frozenset((f"attr-{i}", f"value-{i}") for i in range(n_attrs))
     dom_path = tuple(f"tag-{i}" for i in range(path_depth))
     siblings = tuple(f"sibling-{i}" for i in range(n_siblings))
     bbox = BoundingBox(x=100.0, y=200.0, width=80.0, height=40.0) if with_bbox else None
@@ -91,9 +89,7 @@ def bench_identical_fingerprints() -> None:
 
 
 def bench_empty_fingerprints() -> None:
-    empty = ElementFingerprint(
-        tag="div", text="", attributes=frozenset(), dom_path=(), siblings=()
-    )
+    empty = ElementFingerprint(tag="div", text="", attributes=frozenset(), dom_path=(), siblings=())
     mean_ms = _timeit(lambda: compute_similarity(empty, empty))
     print(f"  Empty pair score:           {mean_ms:.4f} ms  (1 000 iterations)")
 

@@ -1,6 +1,6 @@
 """Breadcrumb -- Self-healing test framework for Playwright."""
 
-from breadcrumb.playwright.page_wrapper import HealablePage, HealableLocator, heal
+from breadcrumb.playwright.page_wrapper import HealableLocator, HealablePage, heal
 
 #: Alias for ``heal()`` — the primary entry point shown in the README.
 crumb = heal
@@ -8,8 +8,8 @@ crumb = heal
 __version__ = "0.1.0-dev"
 
 __all__ = [
-    "HealablePage",
     "HealableLocator",
+    "HealablePage",
     "crumb",
     "heal",
 ]

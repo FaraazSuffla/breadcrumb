@@ -20,7 +20,6 @@ from typing import Sequence
 
 from breadcrumb.core.fingerprint import BoundingBox, ElementFingerprint
 
-
 # ---------------------------------------------------------------------------
 # Individual similarity functions
 # ---------------------------------------------------------------------------

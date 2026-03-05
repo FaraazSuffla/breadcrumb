@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Any
 
 from breadcrumb.core.fingerprint import ElementFingerprint
-from breadcrumb.core.healer import HealResult, Healer
+from breadcrumb.core.healer import Healer, HealResult
 from breadcrumb.core.storage import FingerprintStore
 from breadcrumb.playwright.extractor import (
     extract_all_candidates_sync,
