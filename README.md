@@ -363,3 +363,33 @@ Architectural inspiration from:
 
 ---
 <div align="center"><small>Designed & crafted with ❤️ by Faraaz Suffla</small></div><br>
+
+
+## Common Pitfalls
+
+### Healing not triggering? Check your `test_id`
+
+Breadcrumb keys every fingerprint by `(test_id, locator)`. If `test_id` is empty, the fingerprint is silently skipped and healing will never trigger.
+
+**Wrong:**
+```python
+page = crumb(browser.new_page())          # test_id defaults to "" -- healing disabled
+```
+
+**Right:**
+```python
+page = crumb(browser.new_page(), test_id="test_login")   # fingerprints saved, healing works
+```
+
+If you use the `heal_page` pytest fixture with `--breadcrumb`, `test_id` is set automatically from the test name. This pitfall only affects the standalone `crumb()` / `heal()` wrapper used outside of pytest.
+
+### `.breadcrumb.db` not where you expect it
+
+The database file is created in whichever directory Python runs from -- your terminal's current working directory -- not necessarily your project root.
+
+If you run `python test_login.py` from `C:\Users\you\`, the DB ends up at `C:\Users\you\.breadcrumb.db`. Run your scripts from your project root, or pass an explicit path:
+
+```python
+page = crumb(browser.new_page(), test_id="test_login", db_path="C:/my-project/.breadcrumb.db")
+```
+

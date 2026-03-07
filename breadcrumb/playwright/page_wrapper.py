@@ -71,7 +71,20 @@ def heal(
         store = FingerprintStore(resolved_path)
         healer = Healer(store=store, threshold=threshold, weights=weights)
 
-    return HealablePage(page=page, healer=healer, test_id=test_id)
+    resolved_test_id = test_id
+    if not resolved_test_id:
+        import inspect
+        import os
+        frame = inspect.stack()
+        for f in frame[1:]:
+            fname = f.filename if hasattr(f, "filename") else f[1]
+            func = f.function if hasattr(f, "function") else f[3]
+            if fname and not fname.endswith("page_wrapper.py"):
+                resolved_test_id = f"{os.path.basename(fname)}::{func}"
+                break
+        if not resolved_test_id:
+            resolved_test_id = "breadcrumb_default"
+    return HealablePage(page=page, healer=healer, test_id=resolved_test_id)
 
 
 class HealablePage:
@@ -505,3 +518,4 @@ class HealableLocator:
     def __getattr__(self, name: str) -> Any:
         """Proxy all other attribute access to the underlying Locator."""
         return getattr(self._locator, name)
+
