@@ -2,28 +2,55 @@
 
 from __future__ import annotations
 
+import re
 from html.parser import HTMLParser
 from typing import Any
 
 # Tags we consider interactive / extractable
 _INTERACTIVE_TAGS = frozenset({"button", "a", "input", "select", "textarea", "form"})
 
+# Allowed characters for CSS identifiers (id, class, name used as ident segments)
+_CSS_IDENT_RE = re.compile(r"[^\w-]")
+
+
+def _sanitize_css_ident(value: str) -> str:
+    """Strip characters not safe in a CSS identifier (id, class, name).
+
+    Only word characters (a-z, A-Z, 0-9, _) and hyphens are kept.
+    Returns an empty string if nothing survives sanitization.
+    """
+    return _CSS_IDENT_RE.sub("", value)
+
+
+def _sanitize_css_string(value: str) -> str:
+    """Escape a value for use inside a double-quoted CSS attribute string.
+
+    Escapes backslashes first, then double quotes.
+    """
+    return value.replace("\\", "\\\\").replace('"', '\\"')
+
 
 def _best_selector(el: dict) -> str:
     """Build the best CSS selector for an element dict."""
     tag = el.get("tag", "")
     if el.get("data_testid"):
-        return f'[data-testid="{el["data_testid"]}"]'
+        safe = _sanitize_css_string(el["data_testid"])
+        return f'[data-testid="{safe}"]'
     if el.get("id"):
-        return f"#{el['id']}"
+        safe_id = _sanitize_css_ident(el["id"])
+        if safe_id:
+            return f"#{safe_id}"
     if el.get("name"):
-        return f'{tag}[name="{el["name"]}"]'
+        safe_name = _sanitize_css_ident(el["name"])
+        if safe_name:
+            return f'{tag}[name="{safe_name}"]'
     if el.get("class"):
-        first_cls = el["class"].split()[0]
-        return f"{tag}.{first_cls}"
+        first_cls = _sanitize_css_ident(el["class"].split()[0])
+        if first_cls:
+            return f"{tag}.{first_cls}"
     text = el.get("text")
     if text:
-        safe = text.replace('"', '\\"')
+        safe = _sanitize_css_string(text)
         return f'{tag}:has-text("{safe}")'
     return tag
 
@@ -159,12 +186,16 @@ _JS_EXTRACT = """
         const cls = el.className || null;
         const text = (el.textContent || '').trim().substring(0, 200) || null;
 
+        const escAttr = (v) => v.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        const escIdent = (v) => v.replace(/[^\\w-]/g, '');
         let bestSelector = tag;
-        if (testid) bestSelector = '[data-testid="' + testid + '"]';
-        else if (id) bestSelector = '#' + id;
-        else if (name) bestSelector = tag + '[name="' + name + '"]';
-        else if (cls && typeof cls === 'string') bestSelector = tag + '.' + cls.split(' ')[0];
-        else if (text) bestSelector = tag + ':has-text("' + text.substring(0, 50) + '")';
+        if (testid) bestSelector = '[data-testid="' + escAttr(testid) + '"]';
+        else if (id) { const sid = escIdent(id); if (sid) bestSelector = '#' + sid; }
+        else if (name) bestSelector = tag + '[name="' + escAttr(name) + '"]';
+        else if (cls && typeof cls === 'string') {
+            const sc = escIdent(cls.split(' ')[0]); if (sc) bestSelector = tag + '.' + sc;
+        }
+        else if (text) bestSelector = tag + ':has-text("' + escAttr(text.substring(0, 50)) + '")';
 
         results.push({
             tag,

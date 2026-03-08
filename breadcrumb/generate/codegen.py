@@ -96,16 +96,26 @@ def _to_class_name(page_name: str) -> str:
     return name
 
 
+def _sanitize_prompt_input(value: str, max_len: int = 100) -> str:
+    """Strip non-printable characters and cap length for LLM prompt inputs."""
+    sanitized = re.sub(r"[^\x20-\x7E]", "", value)
+    return sanitized[:max_len]
+
+
 def _try_ollama_enrich(model: str, page_name: str, elements: list[dict]) -> dict | None:
     """Attempt to get richer test names from Ollama. Returns None on failure."""
     try:
         import ollama as ollama_lib
 
+        # Sanitize all user-derived content before embedding in the prompt
+        safe_page_name = _sanitize_prompt_input(page_name)
         tag_summary = ", ".join(
-            f"{e.get('tag')}({e.get('role', 'unknown')})" for e in elements[:20]
+            f"{_sanitize_prompt_input(str(e.get('tag', '')), 20)}"
+            f"({_sanitize_prompt_input(str(e.get('role', 'unknown')), 20)})"
+            for e in elements[:20]
         )
         prompt = (
-            f"Given a page called '{page_name}' with these elements: {tag_summary}. "
+            f"Given a page called '{safe_page_name}' with these elements: {tag_summary}. "
             f"Suggest a one-line docstring for a smoke test of this page. "
             f"Reply with ONLY the docstring text, no quotes."
         )
@@ -116,7 +126,7 @@ def _try_ollama_enrich(model: str, page_name: str, elements: list[dict]) -> dict
         text = response["message"]["content"].strip()
         if text:
             return {"test_docstring": text}
-    except Exception:
+    except (ImportError, OSError, RuntimeError, KeyError, ValueError):
         pass
     return None
 
@@ -154,7 +164,7 @@ class TestCodeGenerator:
                 var = var + "_" + (el.get("tag") or "el")
             seen_vars.add(var)
             selector = el.get("selector", el.get("tag", ""))
-            lines.append(f"        self.{var} = page.locator('{selector}')")
+            lines.append(f"        self.{var} = page.locator({selector!r})")
             var_map.append((var, el))
 
         if not interactive:
@@ -235,7 +245,7 @@ class TestCodeGenerator:
             lines.append(f'        """Verify {var} element is visible."""')
             if page_url:
                 lines.append("        page.goto(self.URL)")
-            lines.append(f"        expect(page.locator('{selector}')).to_be_visible()")
+            lines.append(f"        expect(page.locator({selector!r})).to_be_visible()")
             lines.append("")
 
         # If there are fillable elements, add a fill test
@@ -256,7 +266,7 @@ class TestCodeGenerator:
                     continue
                 else:
                     val = "test value"
-                lines.append(f"        page.locator('{selector}').fill('{val}')")
+                lines.append(f"        page.locator({selector!r}).fill({val!r})")
             lines.append("")
 
         return "\n".join(lines)
