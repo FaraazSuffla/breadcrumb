@@ -106,10 +106,7 @@ class ReportConsole:
             }
         flaky_ids: set[str] = set()
         if has_quarantine:
-            flaky_ids = {
-                r[0]
-                for r in conn.execute("SELECT test_id FROM quarantine").fetchall()
-            }
+            flaky_ids = {r[0] for r in conn.execute("SELECT test_id FROM quarantine").fetchall()}
 
         unstable = healed_ids | failing_ids | flaky_ids
         stable = max(0, total - len(unstable))
@@ -149,15 +146,11 @@ class ReportConsole:
                 cnt = r[2]
                 avg_conf = r[3]
                 label = str(locator_val)
-                lines.append(
-                    f"  {label:<20s} healed {cnt}x  avg confidence: {avg_conf:.2f}"
-                )
+                lines.append(f"  {label:<20s} healed {cnt}x  avg confidence: {avg_conf:.2f}")
 
         # --- Flaky tests section ---
         if has_quarantine and has_test_runs:
-            quarantined = conn.execute(
-                "SELECT test_id, reason FROM quarantine"
-            ).fetchall()
+            quarantined = conn.execute("SELECT test_id, reason FROM quarantine").fetchall()
             if quarantined:
                 lines.append("")
                 lines.append("Flaky tests:")
@@ -173,10 +166,7 @@ class ReportConsole:
                     ).fetchall()
                     fliprate = _compute_fliprate(runs)
                     classification = _classify_fliprate(fliprate)
-                    lines.append(
-                        f"  {q_test_id:<20s} fliprate: {fliprate:.2f}"
-                        f"  status: {classification}"
-                    )
+                    lines.append(f"  {q_test_id:<20s} fliprate: {fliprate:.2f}  status: {classification}")
 
         return "\n".join(lines) + "\n"
 

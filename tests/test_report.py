@@ -93,25 +93,21 @@ class TestReportConsole:
         conn = store._get_conn()
         now = time.time()
         conn.execute(
-            "INSERT INTO test_runs (test_id, status, duration_ms, timestamp) "
-            "VALUES (?, ?, ?, ?)",
+            "INSERT INTO test_runs (test_id, status, duration_ms, timestamp) VALUES (?, ?, ?, ?)",
             ("test_stable", "passed", 100.0, now),
         )
         conn.execute(
-            "INSERT INTO test_runs (test_id, status, duration_ms, timestamp) "
-            "VALUES (?, ?, ?, ?)",
+            "INSERT INTO test_runs (test_id, status, duration_ms, timestamp) VALUES (?, ?, ?, ?)",
             ("test_fail", "failed", 200.0, now),
         )
         conn.execute(
-            "INSERT INTO quarantine (test_id, reason, quarantined_at) "
-            "VALUES (?, ?, ?)",
+            "INSERT INTO quarantine (test_id, reason, quarantined_at) VALUES (?, ?, ?)",
             ("test_flaky", "high fliprate", now),
         )
         # Add runs for the flaky test (pass/fail/pass/fail pattern)
         for i, status in enumerate(["failed", "passed", "failed", "passed"]):
             conn.execute(
-                "INSERT INTO test_runs (test_id, status, duration_ms, timestamp) "
-                "VALUES (?, ?, ?, ?)",
+                "INSERT INTO test_runs (test_id, status, duration_ms, timestamp) VALUES (?, ?, ?, ?)",
                 ("test_flaky", status, 50.0, now + i),
             )
         conn.commit()
@@ -181,9 +177,7 @@ class TestReportJSON:
         assert len(result["healing_events"]) == 1
         assert len(result["top_locators"]) == 1
 
-    def test_export_creates_valid_json(
-        self, store: FingerprintStore, tmp_path: Path
-    ) -> None:
+    def test_export_creates_valid_json(self, store: FingerprintStore, tmp_path: Path) -> None:
         out = tmp_path / "report.json"
         ReportJSON().export(store, out)
         assert out.exists()

@@ -170,10 +170,13 @@ class TestDoctorCommand:
 
 
 class TestGenerateCommand:
-    def test_generate_stub(self, runner: CliRunner) -> None:
+    def test_generate_outputs_page_object(self, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
+        """CLI generate command produces POM + test code without hitting the network."""
+        fake_elements = [{"tag": "button", "id": "login", "text": "Login", "type": "", "classes": []}]
+        monkeypatch.setattr("breadcrumb.generate.crawler.PageCrawler.crawl", lambda self, url: fake_elements)
         result = runner.invoke(cli, ["generate", "http://example.com"])
         assert result.exit_code == 0
-        assert "coming soon" in result.output
+        assert "class" in result.output  # POM class is emitted
 
 
 class TestInitCommand:

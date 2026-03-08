@@ -75,6 +75,7 @@ def heal(
     if not resolved_test_id:
         import inspect
         import os
+
         frame = inspect.stack()
         for f in frame[1:]:
             fname = f.filename if hasattr(f, "filename") else f[1]
@@ -518,4 +519,3 @@ class HealableLocator:
     def __getattr__(self, name: str) -> Any:
         """Proxy all other attribute access to the underlying Locator."""
         return getattr(self._locator, name)
-

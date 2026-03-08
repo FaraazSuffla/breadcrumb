@@ -75,7 +75,11 @@ def _method_params(el: dict) -> str:
     role = el.get("role", "unknown")
 
     if tag in ("input", "textarea", "select") or role in (
-        "email_input", "password_input", "text_input", "search", "dropdown",
+        "email_input",
+        "password_input",
+        "text_input",
+        "search",
+        "dropdown",
     ):
         return ", value: str"
     return ""
@@ -105,7 +109,7 @@ def _sanitize_prompt_input(value: str, max_len: int = 100) -> str:
 def _try_ollama_enrich(model: str, page_name: str, elements: list[dict]) -> dict | None:
     """Attempt to get richer test names from Ollama. Returns None on failure."""
     try:
-        import ollama as ollama_lib
+        import ollama as ollama_lib  # type: ignore[import-untyped]
 
         # Sanitize all user-derived content before embedding in the prompt
         safe_page_name = _sanitize_prompt_input(page_name)
@@ -142,10 +146,7 @@ class TestCodeGenerator:
         cls_name = _to_class_name(page_name)
 
         # Filter to interactive elements only (skip forms, they are containers)
-        interactive = [
-            e for e in elements
-            if e.get("tag") in ("button", "input", "select", "textarea", "a")
-        ]
+        interactive = [e for e in elements if e.get("tag") in ("button", "input", "select", "textarea", "a")]
 
         lines = [
             f"class {cls_name}:",
@@ -210,10 +211,7 @@ class TestCodeGenerator:
         ]
 
         # Generate a smoke test that checks visibility of key elements
-        interactive = [
-            e for e in elements
-            if e.get("tag") in ("button", "input", "select", "textarea", "a")
-        ]
+        interactive = [e for e in elements if e.get("tag") in ("button", "input", "select", "textarea", "a")]
 
         lines.append(f"class Test{cls_name}:")
         lines.append(f'    """{test_docstring}"""')

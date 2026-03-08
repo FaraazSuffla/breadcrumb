@@ -5,7 +5,7 @@ from breadcrumb.playwright.page_wrapper import HealableLocator, HealablePage, he
 #: Alias for ``heal()`` — the primary entry point shown in the README.
 crumb = heal
 
-__version__ = "0.1.0-dev"
+__version__ = "0.1.0a1"
 
 __all__ = [
     "HealableLocator",
