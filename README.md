@@ -93,11 +93,14 @@ That's it.
 ## CLI
 
 ```bash
-breadcrumb report                        # print healing summary to console
-breadcrumb report --format html          # export as HTML
-breadcrumb doctor                        # check DB health and stale fingerprints
-breadcrumb init --name myproject         # scaffold a new project
-breadcrumb generate https://myapp.com   # generate Page Object Models from a URL
+breadcrumb report                            # print healing summary to console
+breadcrumb report --format html              # export HTML dashboard
+breadcrumb report --format json              # export JSON data
+breadcrumb report --days 7                   # limit to last 7 days
+breadcrumb doctor                            # check DB health and stale fingerprints
+breadcrumb init --name myproject             # scaffold a new project
+breadcrumb generate https://myapp.com        # generate Page Object Model from a URL
+breadcrumb generate https://myapp.com --out ./tests  # write files to a directory
 ```
 
 ---
@@ -113,6 +116,18 @@ breadcrumb generate https://myapp.com   # generate Page Object Models from a URL
 | CLI (`report`, `doctor`, `init`, `generate`) | ✅ Working |
 | AI test generation (Page Object Models) | ✅ Working |
 | MCP server + docs site | 🔜 Next |
+
+---
+
+## Security
+
+The `generate` command crawls arbitrary web pages and embeds HTML attribute values into generated Python source files. Breadcrumb protects against this in two ways:
+
+- **CSS selector injection** — `id`, `class`, and `name` attributes are stripped to word characters and hyphens only. `data-testid` and text values are backslash-escaped for CSS quoted strings.
+- **Code injection** — selectors are embedded using Python's `repr()`, which safely escapes all quote variants, backslashes, and newlines before writing them into generated `.py` files.
+- **Prompt injection** — when Ollama is used, page names and element data are stripped of non-printable characters and capped in length before being embedded in LLM prompts.
+
+No generated file can execute or exfiltrate data beyond what Playwright already does.
 
 ---
 
