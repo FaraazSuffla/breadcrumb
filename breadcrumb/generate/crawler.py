@@ -191,7 +191,7 @@ _JS_EXTRACT = """
         let bestSelector = tag;
         if (testid) bestSelector = '[data-testid="' + escAttr(testid) + '"]';
         else if (id) { const sid = escIdent(id); if (sid) bestSelector = '#' + sid; }
-        else if (name) bestSelector = tag + '[name="' + escAttr(name) + '"]';
+        else if (name) { const sn = escIdent(name); if (sn) bestSelector = tag + '[name="' + sn + '"]'; }
         else if (cls && typeof cls === 'string') {
             const sc = escIdent(cls.split(' ')[0]); if (sc) bestSelector = tag + '.' + sc;
         }

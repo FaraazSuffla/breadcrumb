@@ -14,9 +14,9 @@ Self-healing Playwright test library. When a locator breaks because a developer 
 |---|---|---|
 | 1 | Fingerprint engine + SQLite storage + similarity scoring | ✅ Complete |
 | 2 | Playwright wrapper + pytest plugin + basic healing | ✅ Complete |
-| 3 | Flaky test tracker + quarantine + HTML/JSON reporting | ⬜ Planned |
-| 4 | CLI (`report`, `doctor`) + config system | ⬜ Planned |
-| 5 | AI test generation via Ollama + page crawler | ⬜ Planned |
+| 3 | Flaky test tracker + quarantine + HTML/JSON/console reporting | ✅ Complete |
+| 4 | CLI (`report`, `doctor`, `generate`, `init`) + AI test generation | ✅ Complete |
+| 5 | MCP server + MkDocs documentation | ⬜ Planned |
 
 **Not yet published to PyPI.** Install from source only.
 
@@ -38,7 +38,9 @@ Self-healing Playwright test library. When a locator breaks because a developer 
 
 3. **Storage** — Local SQLite (`.breadcrumb.db`, WAL mode). Auto-created on first run. Schema migrations handled internally.
 
-4. **Reporting & Intelligence** *(Phase 3)* — Heal event log with locator, confidence score, timestamp. Powers flakiness reports and quarantine system.
+4. **Reporting & Intelligence** — Heal event log with locator, confidence score, timestamp. Powers flakiness reports and quarantine system. Console, HTML, and JSON output formats.
+
+5. **AI Test Generation** *(Phase 4)* — Page crawler (static + Playwright), semantic element classifier, and codegen producing POM + pytest files. Optional Ollama integration.
 
 ---
 
@@ -51,7 +53,7 @@ Self-healing Playwright test library. When a locator breaks because a developer 
 | Test framework | pytest (plugin architecture) |
 | Similarity algorithms | Jaccard, Levenshtein, LCS (pure Python, zero deps) |
 | Storage | SQLite (stdlib, WAL mode) |
-| AI (optional, Phase 5) | Ollama (local LLMs only) |
+| AI (optional, Phase 4+) | Ollama (local LLMs only) |
 | Linting | Ruff |
 | Type checking | pyright (strict) + mypy (strict) |
 | CI | GitHub Actions |
@@ -141,10 +143,8 @@ pip install -e ".[docs]"        # MkDocs + Material theme
 
 ## What's Next (Priority Order)
 
-1. **Phase 3** — Flaky test tracker, quarantine system, HTML/JSON/console reporting
-2. **Phase 4** — CLI (`breadcrumb report`, `breadcrumb doctor`), `pyproject.toml` config system
-3. **Phase 5** — Ollama integration, page crawler, AI test skeleton generation
-4. **PyPI publish** — After Phase 3 is stable
+1. **Phase 5** — MCP server + MkDocs documentation site
+2. **PyPI publish** — After Phase 5 is stable
 
 ---
 
