@@ -10,12 +10,12 @@ Covers the four vulnerabilities identified in the security review:
 from __future__ import annotations
 
 import ast
+from typing import ClassVar
 
 import pytest
 
 from breadcrumb.generate.codegen import TestCodeGenerator, _sanitize_prompt_input
 from breadcrumb.generate.crawler import PageCrawler, _sanitize_css_ident, _sanitize_css_string
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -34,7 +34,7 @@ def _make_el(
     *,
     tag: str = "button",
     selector: str = "#ok",
-    id: str | None = None,
+    el_id: str | None = None,
     data_testid: str | None = None,
     name: str | None = None,
     cls: str | None = None,
@@ -45,7 +45,7 @@ def _make_el(
     return {
         "tag": tag,
         "selector": selector,
-        "id": id,
+        "id": el_id,
         "data_testid": data_testid,
         "name": name,
         "class": cls,
@@ -66,7 +66,7 @@ def _make_el(
 class TestCodeInjection:
     """Generated Python files must be syntactically valid regardless of selector content."""
 
-    INJECTIONS = [
+    INJECTIONS: ClassVar[list[str]] = [
         # Single-quote breakout attempt
         "button'); import os; os.system('rm -rf /')  #",
         # Double-quote variant
@@ -157,7 +157,7 @@ class TestCssSelectorSanitization:
 
     # --- Integration: crawl_static with malicious HTML ---
 
-    MALICIOUS_HTMLS = [
+    MALICIOUS_HTMLS: ClassVar[list[str]] = [
         # id breakout
         '<button id=\'foo"] + body {color:red} [id="\'>Click</button>',
         # data-testid with quotes

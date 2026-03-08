@@ -164,7 +164,7 @@ class TestCodeGenerator:
                 var = var + "_" + (el.get("tag") or "el")
             seen_vars.add(var)
             selector = el.get("selector", el.get("tag", ""))
-            lines.append(f"        self.{var} = page.locator({repr(selector)})")
+            lines.append(f"        self.{var} = page.locator({selector!r})")
             var_map.append((var, el))
 
         if not interactive:
@@ -245,7 +245,7 @@ class TestCodeGenerator:
             lines.append(f'        """Verify {var} element is visible."""')
             if page_url:
                 lines.append("        page.goto(self.URL)")
-            lines.append(f"        expect(page.locator({repr(selector)})).to_be_visible()")
+            lines.append(f"        expect(page.locator({selector!r})).to_be_visible()")
             lines.append("")
 
         # If there are fillable elements, add a fill test
@@ -266,7 +266,7 @@ class TestCodeGenerator:
                     continue
                 else:
                     val = "test value"
-                lines.append(f"        page.locator({repr(selector)}).fill({repr(val)})")
+                lines.append(f"        page.locator({selector!r}).fill({val!r})")
             lines.append("")
 
         return "\n".join(lines)

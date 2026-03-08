@@ -192,7 +192,9 @@ _JS_EXTRACT = """
         if (testid) bestSelector = '[data-testid="' + escAttr(testid) + '"]';
         else if (id) { const sid = escIdent(id); if (sid) bestSelector = '#' + sid; }
         else if (name) bestSelector = tag + '[name="' + escAttr(name) + '"]';
-        else if (cls && typeof cls === 'string') { const sc = escIdent(cls.split(' ')[0]); if (sc) bestSelector = tag + '.' + sc; }
+        else if (cls && typeof cls === 'string') {
+            const sc = escIdent(cls.split(' ')[0]); if (sc) bestSelector = tag + '.' + sc;
+        }
         else if (text) bestSelector = tag + ':has-text("' + escAttr(text.substring(0, 50)) + '")';
 
         results.push({
