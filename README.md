@@ -266,7 +266,7 @@ page = crumb(browser.new_page(), test_id="test_login", threshold=0.4)
 
 The default is `0.5`. Going below `0.3` risks false positives.
 
-See the [Troubleshooting guide](https://faraazsuffla.github.io/breadcrumb/troubleshooting/) for more common issues.
+See the [Troubleshooting guide](docs/troubleshooting.md) for more common issues.
 
 ---
 

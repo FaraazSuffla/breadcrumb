@@ -64,8 +64,7 @@ pytest --breadcrumb --breadcrumb-report
 
 ## Status
 
-Breadcrumb is **pre-alpha**. All five phases of the roadmap are complete.
-PyPI publication is the next step.
+Breadcrumb is **pre-alpha** (`0.1.0a2`). All five phases of the roadmap are complete and the package is available on PyPI.
 
 | Phase | Focus | Status |
 |---|---|---|

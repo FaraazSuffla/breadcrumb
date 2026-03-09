@@ -24,8 +24,8 @@ def test_login_with_fixture(heal_page):  # type: ignore[no-untyped-def]
     """
     heal_page.goto("https://example.com")
 
-    # These calls are fingerprinted on success; healed on failure.
-    heal_page.locator("h1").is_visible()
+    # Fingerprinted on first run; healed automatically if the selector changes later.
+    assert heal_page.locator("h1").is_visible()
 
 
 # ─── Option 2: standalone script ───────────────────────────────────────────
@@ -51,9 +51,9 @@ def run_standalone() -> None:
 
         page.goto("https://example.com")
 
-        # Run 1: #login-btn is fingerprinted and saved.
-        # Run 2: if the developer renamed it, breadcrumb heals automatically.
-        page.locator("h1").is_visible()
+        # Run 1: the h1 is fingerprinted and saved.
+        # Run 2: if the selector breaks, breadcrumb heals automatically.
+        assert page.locator("h1").is_visible()
 
         browser.close()
 

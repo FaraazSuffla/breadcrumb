@@ -58,7 +58,7 @@ Types: feat, fix, docs, test, refactor, ci, chore
 ### Code Standards
 
 - 100% type hint coverage (pyright strict + mypy strict)
-- 90%+ test coverage
+- 80%+ test coverage (enforced by CI; aim higher where practical)
 - All code formatted with ruff
 - All public APIs documented with docstrings
 
