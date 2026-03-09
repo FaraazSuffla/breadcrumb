@@ -109,7 +109,7 @@ def _sanitize_prompt_input(value: str, max_len: int = 100) -> str:
 def _try_ollama_enrich(model: str, page_name: str, elements: list[dict]) -> dict | None:
     """Attempt to get richer test names from Ollama. Returns None on failure."""
     try:
-        import ollama as ollama_lib  # type: ignore[import-untyped]
+        import ollama as ollama_lib  # type: ignore[import-not-found,import-untyped]
 
         # Sanitize all user-derived content before embedding in the prompt
         safe_page_name = _sanitize_prompt_input(page_name)
@@ -175,8 +175,8 @@ class TestCodeGenerator:
         for var, el in var_map:
             method = _method_name(el)
             # Avoid duplicate method names by using var-based name
-            method = method.split("_", 1)
-            method = method[0] + "_" + var
+            parts = method.split("_", 1)
+            method = parts[0] + "_" + var
             params = _method_params(el)
             body = _method_body(el, var)
 

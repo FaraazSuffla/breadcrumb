@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from html.parser import HTMLParser
-from typing import Any
+from typing import Any, cast
 
 # Tags we consider interactive / extractable
 _INTERACTIVE_TAGS = frozenset({"button", "a", "input", "select", "textarea", "form"})
@@ -30,9 +30,9 @@ def _sanitize_css_string(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def _best_selector(el: dict) -> str:
+def _best_selector(el: dict[str, Any]) -> str:
     """Build the best CSS selector for an element dict."""
-    tag = el.get("tag", "")
+    tag: str = el.get("tag", "")
     if el.get("data_testid"):
         safe = _sanitize_css_string(el["data_testid"])
         return f'[data-testid="{safe}"]'
@@ -233,7 +233,7 @@ class PageCrawler:
         """
         if page is not None:
             page.goto(url, timeout=self.timeout_ms)
-            return page.evaluate(_JS_EXTRACT)
+            return cast(list[dict[Any, Any]], page.evaluate(_JS_EXTRACT))
 
         # Lazy import -- Playwright is optional
         from playwright.sync_api import sync_playwright  # pragma: no cover
@@ -245,7 +245,7 @@ class PageCrawler:
             p.goto(url, timeout=self.timeout_ms)
             elements = p.evaluate(_JS_EXTRACT)
             browser.close()
-            return elements
+            return cast(list[dict[Any, Any]], elements)
 
     def crawl_static(self, html: str) -> list[dict]:
         """Parse a static HTML string and extract interactive elements.

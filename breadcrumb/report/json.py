@@ -205,11 +205,11 @@ class ReportJSON:
 
 def _scalar(conn: object, sql: str, params: tuple[object, ...] = ()) -> int:
     """Execute a query returning a single int."""
-    row = conn.execute(sql, params).fetchone()  # type: ignore[union-attr]
+    row = conn.execute(sql, params).fetchone()  # type: ignore[attr-defined]
     return int(row[0]) if row else 0
 
 
-def _compute_fliprate(runs: list[object]) -> float:
+def _compute_fliprate(runs: list[Any]) -> float:
     """Compute the flip rate: fraction of adjacent status changes."""
     if len(runs) < 2:
         return 0.0

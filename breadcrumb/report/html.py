@@ -6,7 +6,7 @@ import html
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from breadcrumb.core.storage import FingerprintStore
@@ -238,7 +238,7 @@ class ReportHTML:
 
 def _scalar(conn: object, sql: str, params: tuple[object, ...] = ()) -> int:
     """Execute a query returning a single int."""
-    row = conn.execute(sql, params).fetchone()  # type: ignore[union-attr]
+    row = conn.execute(sql, params).fetchone()  # type: ignore[attr-defined]
     return int(row[0]) if row else 0
 
 
@@ -253,7 +253,7 @@ def _card(label: str, value: int, css_class: str) -> str:
     return f'<div class="card{cls}"><div class="label">{_esc(label)}</div><div class="value">{value}</div></div>'
 
 
-def _compute_fliprate(runs: list[object]) -> float:
+def _compute_fliprate(runs: list[Any]) -> float:
     """Compute the flip rate: fraction of adjacent status changes."""
     if len(runs) < 2:
         return 0.0
