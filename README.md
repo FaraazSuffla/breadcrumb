@@ -115,7 +115,7 @@ breadcrumb generate https://myapp.com --out ./tests  # write files to a director
 | Console / HTML / JSON reports | ✅ Working |
 | CLI (`report`, `doctor`, `init`, `generate`) | ✅ Working |
 | AI test generation (Page Object Models) | ✅ Working |
-| MCP server + docs site | 🔜 Next |
+| MCP server + docs site | ✅ Working |
 
 ---
 
