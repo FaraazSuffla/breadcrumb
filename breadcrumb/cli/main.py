@@ -199,7 +199,8 @@ def generate(url: str) -> None:
         click.echo(gen.generate_page_object(page_name, classified))
         click.echo(gen.generate_test_file(page_name, classified, page_url=url))
     except ImportError:
-        click.echo("Phase 4 - AI test generation: install playwright extra first")
+        click.echo("Error: AI test generation requires additional dependencies.")
+        click.echo("  pip install pytest-breadcrumb[playwright,ai]")
 
 
 # ---------------------------------------------------------------------------
@@ -254,8 +255,9 @@ def init(name: str, directory: str) -> None:
     click.echo("")
     click.echo(f"Project '{name}' initialized in {base}")
     click.echo("Next steps:")
-    click.echo("  1. Install dependencies: pip install breadcrumb[playwright,cli]")
-    click.echo("  2. Run tests: pytest --breadcrumb")
+    click.echo("  1. Install dependencies: pip install pytest-breadcrumb[playwright]")
+    click.echo("  2. Install browser: playwright install chromium")
+    click.echo("  3. Run tests: pytest --breadcrumb")
 
 
 # ---------------------------------------------------------------------------

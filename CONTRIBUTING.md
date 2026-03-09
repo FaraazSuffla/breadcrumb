@@ -24,7 +24,10 @@ pre-commit install
 pytest                          # Run all tests
 pytest --cov                    # Run with coverage
 pytest -x                       # Stop on first failure
+pytest --integration            # Run integration tests (require real Chromium browser)
 ```
+
+> **Note:** Integration tests in `tests/test_integration.py` are skipped by default. They require `playwright install chromium` and the `--integration` flag to run.
 
 ### Code Quality
 

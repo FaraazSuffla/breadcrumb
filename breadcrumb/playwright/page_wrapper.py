@@ -22,6 +22,7 @@ so you can mix ``heal(page)`` calls with normal ``page`` calls freely.
 from __future__ import annotations
 
 import logging
+import warnings
 from pathlib import Path
 from typing import Any, cast
 
@@ -76,6 +77,12 @@ def heal(
         import inspect
         import os
 
+        warnings.warn(
+            "No test_id provided to crumb()/heal(). A test_id will be inferred from the "
+            "call stack, but this is fragile — renaming files or functions will break "
+            "healing. Pass an explicit test_id='<name>' for stable fingerprinting.",
+            stacklevel=2,
+        )
         frame = inspect.stack()
         for f in frame[1:]:
             fname = f.filename if hasattr(f, "filename") else f[1]

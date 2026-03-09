@@ -37,6 +37,8 @@ playwright install chromium
 
 Requires **Python 3.10+**.
 
+> **Pre-alpha:** This is an early release (`0.1.0a2`). The API is stable but the project is under active development.
+
 **Optional extras:**
 
 | Extra | Installs |
@@ -94,6 +96,8 @@ def test_login(heal_page):
 ```bash
 pytest --breadcrumb --breadcrumb-report
 ```
+
+`--breadcrumb` enables healing. `--breadcrumb-report` prints a healing summary to the console at the end of the test session. `crumb` and `heal` are identical aliases — use whichever feels natural.
 
 ---
 
@@ -177,7 +181,11 @@ Breadcrumb exposes **7 tools via MCP**, letting Claude and other AI assistants q
 pip install pytest-breadcrumb[mcp]
 ```
 
-**Configure Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+**Configure Claude Desktop** — edit your `claude_desktop_config.json`:
+
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux:** `~/.config/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -232,17 +240,17 @@ Healing a typical page (30–100 elements) adds under **15 ms** per broken locat
 
 ## Common Pitfalls
 
-**Healing not working?** Make sure you pass `test_id` when using the standalone wrapper:
+**Healing not working?** Always pass an explicit `test_id` when using the standalone wrapper:
 
 ```python
-# Wrong — healing silently disabled
+# Avoid — test_id is auto-inferred from the call stack, which can be unstable
 page = crumb(browser.new_page())
 
-# Right — healing works
+# Recommended — stable, predictable fingerprint key
 page = crumb(browser.new_page(), test_id="test_login")
 ```
 
-The pytest `heal_page` fixture sets `test_id` automatically. This only affects standalone usage.
+Without an explicit `test_id`, Breadcrumb infers one from the calling filename and function name. If you refactor code or rename functions, the inferred ID changes and healing breaks. The pytest `heal_page` fixture sets `test_id` automatically from the test node ID.
 
 **Database in the wrong place?** `.breadcrumb.db` is created in the directory you run Python from. To set a fixed location:
 
@@ -257,6 +265,8 @@ page = crumb(browser.new_page(), test_id="test_login", threshold=0.4)
 ```
 
 The default is `0.5`. Going below `0.3` risks false positives.
+
+See the [Troubleshooting guide](https://faraazsuffla.github.io/breadcrumb/troubleshooting/) for more common issues.
 
 ---
 
