@@ -400,12 +400,15 @@ class HealableLocator:
 
     def select_option(self, values: Any = None, **kwargs: Any) -> list[str]:
         """Select option(s) in a <select>, with self-healing on failure."""
-        return cast(list[str], self._execute_with_healing(
-            "select_option",
-            self._locator.select_option,
-            values,
-            **kwargs,
-        ))
+        return cast(
+            list[str],
+            self._execute_with_healing(
+                "select_option",
+                self._locator.select_option,
+                values,
+                **kwargs,
+            ),
+        )
 
     def hover(self, **kwargs: Any) -> None:
         """Hover over the element, with self-healing on failure."""
@@ -425,68 +428,92 @@ class HealableLocator:
 
     def input_value(self, **kwargs: Any) -> str:
         """Get input value, with self-healing on failure."""
-        return cast(str, self._execute_with_healing(
-            "input_value",
-            self._locator.input_value,
-            **kwargs,
-        ))
+        return cast(
+            str,
+            self._execute_with_healing(
+                "input_value",
+                self._locator.input_value,
+                **kwargs,
+            ),
+        )
 
     def inner_text(self, **kwargs: Any) -> str:
         """Get inner text, with self-healing on failure."""
-        return cast(str, self._execute_with_healing(
-            "inner_text",
-            self._locator.inner_text,
-            **kwargs,
-        ))
+        return cast(
+            str,
+            self._execute_with_healing(
+                "inner_text",
+                self._locator.inner_text,
+                **kwargs,
+            ),
+        )
 
     def inner_html(self, **kwargs: Any) -> str:
         """Get inner HTML, with self-healing on failure."""
-        return cast(str, self._execute_with_healing(
-            "inner_html",
-            self._locator.inner_html,
-            **kwargs,
-        ))
+        return cast(
+            str,
+            self._execute_with_healing(
+                "inner_html",
+                self._locator.inner_html,
+                **kwargs,
+            ),
+        )
 
     def text_content(self, **kwargs: Any) -> str | None:
         """Get text content, with self-healing on failure."""
-        return cast("str | None", self._execute_with_healing(
-            "text_content",
-            self._locator.text_content,
-            **kwargs,
-        ))
+        return cast(
+            "str | None",
+            self._execute_with_healing(
+                "text_content",
+                self._locator.text_content,
+                **kwargs,
+            ),
+        )
 
     def get_attribute(self, name: str, **kwargs: Any) -> str | None:
         """Get attribute value, with self-healing on failure."""
-        return cast("str | None", self._execute_with_healing(
-            "get_attribute",
-            self._locator.get_attribute,
-            name,
-            **kwargs,
-        ))
+        return cast(
+            "str | None",
+            self._execute_with_healing(
+                "get_attribute",
+                self._locator.get_attribute,
+                name,
+                **kwargs,
+            ),
+        )
 
     def is_visible(self, **kwargs: Any) -> bool:
         """Check visibility, with self-healing on failure."""
-        return cast(bool, self._execute_with_healing(
-            "is_visible",
-            self._locator.is_visible,
-            **kwargs,
-        ))
+        return cast(
+            bool,
+            self._execute_with_healing(
+                "is_visible",
+                self._locator.is_visible,
+                **kwargs,
+            ),
+        )
 
     def is_enabled(self, **kwargs: Any) -> bool:
         """Check if enabled, with self-healing on failure."""
-        return cast(bool, self._execute_with_healing(
-            "is_enabled",
-            self._locator.is_enabled,
-            **kwargs,
-        ))
+        return cast(
+            bool,
+            self._execute_with_healing(
+                "is_enabled",
+                self._locator.is_enabled,
+                **kwargs,
+            ),
+        )
 
     def is_checked(self, **kwargs: Any) -> bool:
         """Check if checked, with self-healing on failure."""
-        return cast(bool, self._execute_with_healing(
-            "is_checked",
-            self._locator.is_checked,
-            **kwargs,
-        ))
+        return cast(
+            bool,
+            self._execute_with_healing(
+                "is_checked",
+                self._locator.is_checked,
+                **kwargs,
+            ),
+        )
 
     def count(self) -> int:
         """Return the number of matching elements (no healing — count can't fail)."""
