@@ -159,6 +159,6 @@ breadcrumb mcp [OPTIONS]
 |---|---|---|
 | `--db PATH` | `.breadcrumb.db` | Default database path for tools |
 
-**Requires:** `pip install breadcrumb[mcp]`
+**Requires:** `pip install playwright-crumb[mcp]`
 
 See [MCP Server](mcp.md) for full setup instructions and available tools.
