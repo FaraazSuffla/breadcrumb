@@ -7,9 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
-- PyPI publication
-
 ## [0.1.0a2] - 2026-03-09
 
 ### Added

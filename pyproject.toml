@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "breadcrumb"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Self-healing test framework for Playwright. Your tests survive app changes."
 readme = "README.md"
 license = "BSD-3-Clause"
