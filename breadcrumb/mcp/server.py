@@ -370,10 +370,10 @@ def create_server() -> Any:
     Returns:
         A configured :class:`mcp.server.Server` instance.
     """
-    from mcp import types
-    from mcp.server import Server
+    from mcp import types  # type: ignore[import-not-found]
+    from mcp.server import Server  # type: ignore[import-not-found]
 
-    app: Server = Server("breadcrumb")
+    app: Any = Server("breadcrumb")
 
     @app.list_tools()
     async def list_tools() -> list[types.Tool]:
@@ -426,7 +426,7 @@ async def main(db_path: str = ".breadcrumb.db") -> None:
         db_path: Default database path passed to tools that accept it.
             Individual tool calls can override this per-invocation.
     """
-    from mcp.server.stdio import stdio_server
+    from mcp.server.stdio import stdio_server  # type: ignore[import-not-found]
 
     app = create_server()
     async with stdio_server() as streams:
