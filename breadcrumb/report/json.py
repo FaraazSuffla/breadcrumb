@@ -104,12 +104,7 @@ class ReportJSON:
             }
         flaky_ids: set[str] = set()
         if has_quarantine:
-            flaky_ids = {
-                r[0]
-                for r in conn.execute(
-                    "SELECT test_id FROM quarantine"
-                ).fetchall()
-            }
+            flaky_ids = {r[0] for r in conn.execute("SELECT test_id FROM quarantine").fetchall()}
 
         stable = max(0, total - len(healed_ids | failing_ids | flaky_ids))
 
@@ -125,14 +120,16 @@ class ReportJSON:
         ).fetchall()
         healing_events: list[dict[str, Any]] = []
         for r in event_rows:
-            healing_events.append({
-                "timestamp": r[0],
-                "test_id": r[1],
-                "locator": r[2],
-                "confidence": r[3],
-                "original": json.loads(r[4]),
-                "healed": json.loads(r[5]),
-            })
+            healing_events.append(
+                {
+                    "timestamp": r[0],
+                    "test_id": r[1],
+                    "locator": r[2],
+                    "confidence": r[3],
+                    "original": json.loads(r[4]),
+                    "healed": json.loads(r[5]),
+                }
+            )
 
         # --- Top locators ---
         top_rows = conn.execute(
@@ -146,44 +143,44 @@ class ReportJSON:
         ).fetchall()
         top_locators: list[dict[str, Any]] = []
         for r in top_rows:
-            top_locators.append({
-                "test_id": r[0],
-                "locator": r[1],
-                "count": r[2],
-                "avg_confidence": round(r[3], 4),
-            })
+            top_locators.append(
+                {
+                    "test_id": r[0],
+                    "locator": r[1],
+                    "count": r[2],
+                    "avg_confidence": round(r[3], 4),
+                }
+            )
 
         # --- Flaky tests ---
         flaky_tests: list[dict[str, Any]] = []
         if has_quarantine and has_test_runs:
-            quarantined = conn.execute(
-                "SELECT test_id, reason FROM quarantine"
-            ).fetchall()
+            quarantined = conn.execute("SELECT test_id, reason FROM quarantine").fetchall()
             for q in quarantined:
                 q_id = q[0]
                 q_reason = q[1]
                 runs = conn.execute(
-                    "SELECT status FROM test_runs "
-                    "WHERE test_id = ? AND timestamp >= ? "
-                    "ORDER BY timestamp ASC",
+                    "SELECT status FROM test_runs WHERE test_id = ? AND timestamp >= ? ORDER BY timestamp ASC",
                     (q_id, cutoff),
                 ).fetchall()
                 fliprate = _compute_fliprate(runs)
-                flaky_tests.append({
-                    "test_id": q_id,
-                    "reason": q_reason,
-                    "fliprate": round(fliprate, 4),
-                })
+                flaky_tests.append(
+                    {
+                        "test_id": q_id,
+                        "reason": q_reason,
+                        "fliprate": round(fliprate, 4),
+                    }
+                )
         elif has_quarantine:
-            quarantined = conn.execute(
-                "SELECT test_id, reason FROM quarantine"
-            ).fetchall()
+            quarantined = conn.execute("SELECT test_id, reason FROM quarantine").fetchall()
             for q in quarantined:
-                flaky_tests.append({
-                    "test_id": q[0],
-                    "reason": q[1],
-                    "fliprate": 0.0,
-                })
+                flaky_tests.append(
+                    {
+                        "test_id": q[0],
+                        "reason": q[1],
+                        "fliprate": 0.0,
+                    }
+                )
 
         return {
             "generated_at": now,
@@ -200,28 +197,25 @@ class ReportJSON:
             "top_locators": top_locators,
         }
 
-    def export(
-        self, store: FingerprintStore, path: str | Path, days: int = 30
-    ) -> None:
+    def export(self, store: FingerprintStore, path: str | Path, days: int = 30) -> None:
         """Write the JSON report to a file."""
         data = self.render(store, days)
-        Path(path).write_text(
-            json.dumps(data, indent=2), encoding="utf-8"
-        )
+        Path(path).write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
 def _scalar(conn: object, sql: str, params: tuple[object, ...] = ()) -> int:
     """Execute a query returning a single int."""
-    row = conn.execute(sql, params).fetchone()  # type: ignore[union-attr]
+    row = conn.execute(sql, params).fetchone()  # type: ignore[attr-defined]
     return int(row[0]) if row else 0
 
 
-def _compute_fliprate(runs: list[object]) -> float:
+def _compute_fliprate(runs: list[Any]) -> float:
     """Compute the flip rate: fraction of adjacent status changes."""
     if len(runs) < 2:
         return 0.0
     flips = sum(
-        1 for i in range(1, len(runs))
+        1
+        for i in range(1, len(runs))
         if runs[i][0] != runs[i - 1][0]  # type: ignore[index]
     )
     return flips / (len(runs) - 1)

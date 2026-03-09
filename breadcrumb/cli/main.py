@@ -74,10 +74,7 @@ def _builtin_console_report(db: str, days: int) -> None:
         cutoff = time.time() - days * 86400
 
         # Check which tables exist
-        tables = {
-            row[0]
-            for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-        }
+        tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
 
         click.echo(f"Breadcrumb Report (last {days} days)")
         click.echo("=" * 40)
@@ -133,17 +130,12 @@ def doctor(db: str) -> None:
     conn = sqlite3.connect(db)
     conn.row_factory = sqlite3.Row
     try:
-        tables = {
-            row[0]
-            for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-        }
+        tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
 
         # Schema version
         schema_version = "unknown"
         if "schema_meta" in tables:
-            row = conn.execute(
-                "SELECT value FROM schema_meta WHERE key = 'schema_version'"
-            ).fetchone()
+            row = conn.execute("SELECT value FROM schema_meta WHERE key = 'schema_version'").fetchone()
             if row is not None:
                 schema_version = row[0]
         click.echo(f"Schema version: {schema_version}")
@@ -196,11 +188,18 @@ def doctor(db: str) -> None:
 def generate(url: str) -> None:
     """Generate tests from a URL using AI (Phase 4)."""
     try:
-        from breadcrumb.generate import crawler  # type: ignore[attr-defined]
+        from breadcrumb.generate.classifier import ElementClassifier
+        from breadcrumb.generate.codegen import TestCodeGenerator
+        from breadcrumb.generate.crawler import PageCrawler
 
-        crawler.run(url)
-    except (ImportError, AttributeError):
-        click.echo("Phase 4 - AI test generation: coming soon")
+        page_name = url.rstrip("/").rsplit("/", 1)[-1] or "page"
+        elements = PageCrawler().crawl(url)
+        classified = [dict(el, role=ElementClassifier().classify(el)) for el in elements]
+        gen = TestCodeGenerator()
+        click.echo(gen.generate_page_object(page_name, classified))
+        click.echo(gen.generate_test_file(page_name, classified, page_url=url))
+    except ImportError:
+        click.echo("Phase 4 - AI test generation: install playwright extra first")
 
 
 # ---------------------------------------------------------------------------

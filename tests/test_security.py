@@ -21,6 +21,7 @@ from breadcrumb.generate.crawler import PageCrawler, _sanitize_css_ident, _sanit
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _is_valid_python(source: str) -> bool:
     """Return True if *source* is syntactically valid Python."""
     try:
@@ -63,6 +64,7 @@ def _make_el(
 # HIGH: Code injection via unescaped selectors (codegen.py)
 # ---------------------------------------------------------------------------
 
+
 class TestCodeInjection:
     """Generated Python files must be syntactically valid regardless of selector content."""
 
@@ -84,9 +86,7 @@ class TestCodeInjection:
         return TestCodeGenerator()
 
     @pytest.mark.parametrize("malicious_selector", INJECTIONS)
-    def test_generate_page_object_is_valid_python(
-        self, gen: TestCodeGenerator, malicious_selector: str
-    ) -> None:
+    def test_generate_page_object_is_valid_python(self, gen: TestCodeGenerator, malicious_selector: str) -> None:
         el = _make_el(tag="button", selector=malicious_selector)
         source = gen.generate_page_object("LoginPage", [el])
         assert _is_valid_python(source), (
@@ -94,9 +94,7 @@ class TestCodeInjection:
         )
 
     @pytest.mark.parametrize("malicious_selector", INJECTIONS)
-    def test_generate_test_file_is_valid_python(
-        self, gen: TestCodeGenerator, malicious_selector: str
-    ) -> None:
+    def test_generate_test_file_is_valid_python(self, gen: TestCodeGenerator, malicious_selector: str) -> None:
         el = _make_el(tag="button", selector=malicious_selector)
         source = gen.generate_test_file("LoginPage", [el], page_url="http://localhost/")
         assert _is_valid_python(source), (
@@ -125,6 +123,7 @@ class TestCodeInjection:
 # ---------------------------------------------------------------------------
 # MEDIUM: CSS selector injection (crawler.py)
 # ---------------------------------------------------------------------------
+
 
 class TestCssSelectorSanitization:
     """_best_selector must not embed raw HTML attribute values verbatim."""
@@ -159,30 +158,24 @@ class TestCssSelectorSanitization:
 
     MALICIOUS_HTMLS: ClassVar[list[str]] = [
         # id breakout
-        '<button id=\'foo"] + body {color:red} [id="\'>Click</button>',
+        "<button id='foo\"] + body {color:red} [id=\"'>Click</button>",
         # data-testid with quotes
-        '<button data-testid=\'x"] y z\'>Click</button>',
+        "<button data-testid='x\"] y z'>Click</button>",
         # name attribute with CSS injection
-        '<input name=\'n"] + * {display:none} [name="\' />',
+        "<input name='n\"] + * {display:none} [name=\"' />",
         # class with CSS injection
-        '<button class=\'cls"] + body\'>Click</button>',
+        "<button class='cls\"] + body'>Click</button>",
     ]
 
     @pytest.mark.parametrize("html_snippet", MALICIOUS_HTMLS)
-    def test_crawl_static_selector_no_raw_injection(
-        self, crawler: PageCrawler, html_snippet: str
-    ) -> None:
+    def test_crawl_static_selector_no_raw_injection(self, crawler: PageCrawler, html_snippet: str) -> None:
         elements = crawler.crawl_static(html_snippet)
         assert elements, "Expected at least one element"
         for el in elements:
             selector = el.get("selector", "")
             # The injection strings must not appear verbatim in any selector
-            assert "] + body" not in selector, (
-                f"CSS injection leaked into selector: {selector!r}"
-            )
-            assert "{display:none}" not in selector, (
-                f"CSS injection leaked into selector: {selector!r}"
-            )
+            assert "] + body" not in selector, f"CSS injection leaked into selector: {selector!r}"
+            assert "{display:none}" not in selector, f"CSS injection leaked into selector: {selector!r}"
 
     def test_clean_id_preserved(self, crawler: PageCrawler) -> None:
         elements = crawler.crawl_static('<button id="login-btn">Go</button>')
@@ -198,6 +191,7 @@ class TestCssSelectorSanitization:
 # ---------------------------------------------------------------------------
 # LOW: Prompt injection sanitization helper
 # ---------------------------------------------------------------------------
+
 
 class TestPromptInputSanitization:
     """_sanitize_prompt_input must strip control chars and cap length."""
