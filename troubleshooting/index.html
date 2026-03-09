@@ -868,6 +868,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#fixture-page-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fixture 'page' not found
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#healing-isnt-working" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1006,6 +1017,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#fixture-page-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fixture 'page' not found
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#healing-isnt-working" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1105,6 +1127,19 @@
 <h1 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h1>
 <p>Common problems and how to fix them.</p>
 <hr />
+<h2 id="fixture-page-not-found"><code>fixture 'page' not found</code><a class="headerlink" href="#fixture-page-not-found" title="Permanent link">&para;</a></h2>
+<p><strong>Symptom:</strong> Running <code>pytest --breadcrumb</code> fails immediately with:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>fixture &#39;page&#39; not found
+</code></pre></div></p>
+<p><strong>Cause:</strong> The <code>page</code> fixture comes from <code>pytest-playwright</code>, which must be installed separately.</p>
+<p><strong>Fix:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pytest-playwright
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>playwright<span class="w"> </span>install<span class="w"> </span>chromium
+</code></pre></div></p>
+<p>Or reinstall with the <code>[playwright]</code> extra, which now includes it:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pytest-breadcrumb[playwright]&quot;</span>
+</code></pre></div></p>
+<hr />
 <h2 id="healing-isnt-working">Healing isn't working<a class="headerlink" href="#healing-isnt-working" title="Permanent link">&para;</a></h2>
 <p><strong>Symptom:</strong> Tests still fail on locator changes even after running them once.</p>
 <p><strong>Causes &amp; fixes:</strong></p>
@@ -1112,23 +1147,23 @@
 <li><strong><code>test_id</code> is not stable</strong> — If you use the standalone wrapper without an explicit <code>test_id</code>, breadcrumb infers one from the call stack. Renaming the calling file or function changes the inferred ID, breaking fingerprint lookup.</li>
 </ol>
 <p>Fix: always pass an explicit, stable <code>test_id</code>:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">page</span> <span class="o">=</span> <span class="n">crumb</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">new_page</span><span class="p">(),</span> <span class="n">test_id</span><span class="o">=</span><span class="s2">&quot;test_login&quot;</span><span class="p">)</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">page</span> <span class="o">=</span> <span class="n">crumb</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">new_page</span><span class="p">(),</span> <span class="n">test_id</span><span class="o">=</span><span class="s2">&quot;test_login&quot;</span><span class="p">)</span>
 </code></pre></div></p>
 <ol>
 <li><strong>Database is in the wrong place</strong> — <code>.breadcrumb.db</code> is created in the directory you run Python or pytest from. If you run from different directories, multiple databases are created and fingerprints are not shared.</li>
 </ol>
 <p>Fix: pin the database path:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">page</span> <span class="o">=</span> <span class="n">crumb</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">new_page</span><span class="p">(),</span> <span class="n">test_id</span><span class="o">=</span><span class="s2">&quot;test_login&quot;</span><span class="p">,</span> <span class="n">db_path</span><span class="o">=</span><span class="s2">&quot;./tests/.breadcrumb.db&quot;</span><span class="p">)</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">page</span> <span class="o">=</span> <span class="n">crumb</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">new_page</span><span class="p">(),</span> <span class="n">test_id</span><span class="o">=</span><span class="s2">&quot;test_login&quot;</span><span class="p">,</span> <span class="n">db_path</span><span class="o">=</span><span class="s2">&quot;./tests/.breadcrumb.db&quot;</span><span class="p">)</span>
 </code></pre></div>
    Or in <code>pytest.ini</code>:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">[pytest]</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">addopts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">--breadcrumb --breadcrumb-db ./tests/.breadcrumb.db</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">[pytest]</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="na">addopts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">--breadcrumb --breadcrumb-db ./tests/.breadcrumb.db</span>
 </code></pre></div></p>
 <ol>
 <li><strong>Confidence threshold too high</strong> — The default is <code>0.5</code>. If your app has large DOM changes between versions (many classes and IDs renamed at once), the best candidate might score below <code>0.5</code>.</li>
 </ol>
 <p>Fix: lower the threshold:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">page</span> <span class="o">=</span> <span class="n">crumb</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">new_page</span><span class="p">(),</span> <span class="n">test_id</span><span class="o">=</span><span class="s2">&quot;test_login&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">page</span> <span class="o">=</span> <span class="n">crumb</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">new_page</span><span class="p">(),</span> <span class="n">test_id</span><span class="o">=</span><span class="s2">&quot;test_login&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
 </code></pre></div>
    Do not go below <code>0.3</code> — false positives become likely.</p>
 <ol>
@@ -1154,7 +1189,7 @@
 <ul>
 <li>Tests weren't run with <code>--breadcrumb</code>. Breadcrumb only records data when the plugin is active.</li>
 <li>Database is in a different directory than where you're running the CLI. Use <code>--db</code> to point to the right file:
-  <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>breadcrumb<span class="w"> </span>report<span class="w"> </span>--db<span class="w"> </span>./tests/.breadcrumb.db
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>breadcrumb<span class="w"> </span>report<span class="w"> </span>--db<span class="w"> </span>./tests/.breadcrumb.db
 </code></pre></div></li>
 </ul>
 <hr />
@@ -1168,20 +1203,20 @@
 <h2 id="breadcrumb-generate-fails"><code>breadcrumb generate</code> fails<a class="headerlink" href="#breadcrumb-generate-fails" title="Permanent link">&para;</a></h2>
 <p><strong>Symptom:</strong> <code>Error: AI test generation requires additional dependencies.</code></p>
 <p><strong>Fix:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pytest-breadcrumb<span class="o">[</span>playwright,ai<span class="o">]</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>playwright<span class="w"> </span>install<span class="w"> </span>chromium
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pytest-breadcrumb<span class="o">[</span>playwright,ai<span class="o">]</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>playwright<span class="w"> </span>install<span class="w"> </span>chromium
 </code></pre></div></p>
 <hr />
 <h2 id="breadcrumb-mcp-fails"><code>breadcrumb mcp</code> fails<a class="headerlink" href="#breadcrumb-mcp-fails" title="Permanent link">&para;</a></h2>
 <p><strong>Symptom:</strong> <code>Error: MCP server requires the 'mcp' extra.</code></p>
 <p><strong>Fix:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pytest-breadcrumb<span class="o">[</span>mcp<span class="o">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pytest-breadcrumb<span class="o">[</span>mcp<span class="o">]</span>
 </code></pre></div></p>
 <hr />
 <h2 id="integration-tests-fail-or-are-skipped">Integration tests fail or are skipped<a class="headerlink" href="#integration-tests-fail-or-are-skipped" title="Permanent link">&para;</a></h2>
 <p>Integration tests (in <code>tests/test_integration.py</code>) require a real Chromium browser and must be opted into explicitly:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>playwright<span class="w"> </span>install<span class="w"> </span>chromium
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>pytest<span class="w"> </span>--integration
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>playwright<span class="w"> </span>install<span class="w"> </span>chromium
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>pytest<span class="w"> </span>--integration
 </code></pre></div>
 <p>Without <code>--integration</code>, the tests are silently skipped (not failed).</p>
 
