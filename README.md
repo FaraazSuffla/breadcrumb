@@ -11,6 +11,8 @@
         <img alt="License" src="https://img.shields.io/github/license/FaraazSuffla/breadcrumb.svg"></a>
     <img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-blue">
     <img alt="Status" src="https://img.shields.io/badge/status-pre--alpha-orange">
+    <a href="https://faraazsuffla.github.io/breadcrumb/">
+        <img alt="Docs" src="https://img.shields.io/badge/docs-online-blue"></a>
 </p>
 
 ---
