@@ -16,7 +16,7 @@ Self-healing Playwright test library. When a locator breaks because a developer 
 | 2 | Playwright wrapper + pytest plugin + basic healing | ✅ Complete |
 | 3 | Flaky test tracker + quarantine + HTML/JSON/console reporting | ✅ Complete |
 | 4 | CLI (`report`, `doctor`, `generate`, `init`) + AI test generation | ✅ Complete |
-| 5 | MCP server + MkDocs documentation | ⬜ Planned |
+| 5 | MCP server + MkDocs documentation | ✅ Complete |
 
 **Not yet published to PyPI.** Install from source only.
 

@@ -8,8 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- MCP server for IDE/AI assistant integration (Phase 5)
-- MkDocs documentation site
+- PyPI publication
+
+## [0.1.0a2] - 2026-03-09
+
+### Added
+
+**MCP server (Phase 5)**
+- `breadcrumb.mcp.server` — Model Context Protocol server exposing seven breadcrumb tools
+  to Claude Code, Claude Desktop, and other MCP-compatible AI assistants
+- `breadcrumb mcp` CLI command starts the server over stdio transport
+- Tools: `breadcrumb_stats`, `breadcrumb_report`, `breadcrumb_doctor`,
+  `breadcrumb_healing_events`, `breadcrumb_flaky_tests`, `breadcrumb_generate_tests`,
+  `breadcrumb_list_fingerprints`
+- New optional extra: `mcp = ["mcp>=1.0"]`
+
+**MkDocs documentation site (Phase 5)**
+- Full documentation site built with MkDocs + Material theme + mkdocstrings
+- Pages: index, getting-started, concepts, CLI reference, MCP server, architecture, API reference, changelog
+- GitHub Actions workflow (`docs.yml`) deploys to GitHub Pages on every push to `main`
 
 ## [0.1.0a1] - 2026-03-08
 

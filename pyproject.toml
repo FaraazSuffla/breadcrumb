@@ -44,6 +44,7 @@ breadcrumb = "breadcrumb.plugins.pytest_plugin"
 [project.optional-dependencies]
 playwright = ["playwright>=1.40"]
 ai = ["ollama>=0.1"]
+mcp = ["mcp>=1.0"]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
@@ -101,6 +102,10 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["mcp", "mcp.*"]
+ignore_missing_imports = true
 
 # ---- Pytest ----
 

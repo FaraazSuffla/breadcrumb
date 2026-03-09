@@ -1,6 +1,6 @@
 """Breadcrumb CLI entry point.
 
-Provides commands: report, doctor, generate, init.
+Provides commands: report, doctor, generate, init, mcp.
 """
 
 from __future__ import annotations
@@ -256,3 +256,37 @@ def init(name: str, directory: str) -> None:
     click.echo("Next steps:")
     click.echo("  1. Install dependencies: pip install breadcrumb[playwright,cli]")
     click.echo("  2. Run tests: pytest --breadcrumb")
+
+
+# ---------------------------------------------------------------------------
+# breadcrumb mcp
+# ---------------------------------------------------------------------------
+
+
+@cli.command()
+@click.option("--db", default=DEFAULT_DB, help="Default database path for tools.", show_default=True)
+def mcp(db: str) -> None:
+    """Start the MCP server (stdio transport) for AI assistant integration.
+
+    Add to your Claude Desktop / Code config:
+
+    \b
+    {
+      "mcpServers": {
+        "breadcrumb": {
+          "command": "breadcrumb",
+          "args": ["mcp"]
+        }
+      }
+    }
+    """
+    try:
+        import asyncio
+
+        from breadcrumb.mcp.server import main as mcp_main
+
+        asyncio.run(mcp_main(db))
+    except ImportError:
+        click.echo("Error: MCP server requires the 'mcp' extra.")
+        click.echo("  pip install breadcrumb[mcp]")
+        raise SystemExit(1) from None
