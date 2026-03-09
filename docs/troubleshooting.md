@@ -4,6 +4,28 @@ Common problems and how to fix them.
 
 ---
 
+## `fixture 'page' not found`
+
+**Symptom:** Running `pytest --breadcrumb` fails immediately with:
+```
+fixture 'page' not found
+```
+
+**Cause:** The `page` fixture comes from `pytest-playwright`, which must be installed separately.
+
+**Fix:**
+```bash
+pip install pytest-playwright
+playwright install chromium
+```
+
+Or reinstall with the `[playwright]` extra, which now includes it:
+```bash
+pip install "pytest-breadcrumb[playwright]"
+```
+
+---
+
 ## Healing isn't working
 
 **Symptom:** Tests still fail on locator changes even after running them once.
