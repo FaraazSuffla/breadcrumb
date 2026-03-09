@@ -17,6 +17,10 @@
 
 ---
 
+**[Full documentation →](https://faraazsuffla.github.io/breadcrumb/)**
+
+---
+
 ## What is this?
 
 Your Playwright test clicks `#login-btn`. A developer renames it to `.auth-button`. The button still works — but your test crashes.
