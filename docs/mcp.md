@@ -7,7 +7,7 @@ other MCP-compatible AI assistants.
 ## Installation
 
 ```bash
-pip install playwright-crumb[mcp]
+pip install pytest-breadcrumb[mcp]
 ```
 
 ## Claude Desktop / Claude Code Configuration

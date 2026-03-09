@@ -9,7 +9,7 @@
 ## Quick Install
 
 ```bash
-pip install playwright-crumb[playwright]
+pip install pytest-breadcrumb[playwright]
 playwright install chromium
 ```
 

@@ -5,20 +5,20 @@
 Breadcrumb requires Python 3.10+ and Playwright.
 
 ```bash
-pip install playwright-crumb[playwright]
+pip install pytest-breadcrumb[playwright]
 playwright install chromium
 ```
 
 For the full feature set (AI generation + MCP server):
 
 ```bash
-pip install playwright-crumb[playwright,ai,mcp]
+pip install pytest-breadcrumb[playwright,ai,mcp]
 ```
 
 To build the documentation locally:
 
 ```bash
-pip install playwright-crumb[docs]
+pip install pytest-breadcrumb[docs]
 mkdocs serve
 ```
 
