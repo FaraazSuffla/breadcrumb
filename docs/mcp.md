@@ -12,7 +12,13 @@ pip install pytest-breadcrumb[mcp]
 
 ## Claude Desktop / Claude Code Configuration
 
-Add breadcrumb to your `claude_desktop_config.json` (or Claude Code MCP settings):
+Add breadcrumb to your `claude_desktop_config.json` (or Claude Code MCP settings).
+
+Config file location by OS:
+
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux:** `~/.config/Claude/claude_desktop_config.json`
 
 ```json
 {

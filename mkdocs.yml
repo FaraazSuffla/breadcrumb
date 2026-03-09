@@ -57,6 +57,7 @@ nav:
       - Flaky Tests: api/flaky.md
       - Reports: api/report.md
       - AI Generation: api/generate.md
+  - Troubleshooting: troubleshooting.md
   - Changelog: changelog.md
 
 markdown_extensions:
