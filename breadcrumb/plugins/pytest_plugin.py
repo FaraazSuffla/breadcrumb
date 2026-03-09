@@ -22,13 +22,12 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Generator
+from typing import TYPE_CHECKING, Any, Generator
 
 import pytest
 
-from breadcrumb.core.healer import Healer
-from breadcrumb.core.storage import FingerprintStore
-from breadcrumb.playwright.page_wrapper import HealablePage
+if TYPE_CHECKING:
+    from breadcrumb.playwright.page_wrapper import HealablePage
 
 logger = logging.getLogger("breadcrumb.plugin")
 
@@ -66,6 +65,9 @@ class BreadcrumbState:
     """Shared state for the Breadcrumb plugin across a test session."""
 
     def __init__(self, db_path: str, threshold: float) -> None:
+        from breadcrumb.core.healer import Healer
+        from breadcrumb.core.storage import FingerprintStore
+
         self.store = FingerprintStore(Path(db_path))
         self.healer = Healer(store=self.store, threshold=threshold)
         self.healed_count = 0
@@ -146,6 +148,10 @@ def heal_page(request: pytest.FixtureRequest) -> Generator[HealablePage, None, N
     Yields:
         A HealablePage wrapping the Playwright page.
     """
+    from breadcrumb.core.healer import Healer
+    from breadcrumb.core.storage import FingerprintStore
+    from breadcrumb.playwright.page_wrapper import HealablePage
+
     # Get the Playwright page from the existing 'page' fixture
     page = request.getfixturevalue("page")
     test_id = request.node.nodeid
