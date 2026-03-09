@@ -30,12 +30,8 @@ Beyond healing, Breadcrumb also:
 
 ## Install
 
-> Not on PyPI yet. Install from source:
-
 ```bash
-git clone https://github.com/FaraazSuffla/breadcrumb.git
-cd breadcrumb
-pip install -e ".[dev]"
+pip install playwright-crumb[playwright]
 playwright install chromium
 ```
 
@@ -45,10 +41,19 @@ Requires **Python 3.10+**.
 
 | Extra | Installs |
 |---|---|
-| `pip install -e ".[playwright]"` | Playwright wrapper only |
-| `pip install -e ".[mcp]"` | MCP server (for AI assistants) |
-| `pip install -e ".[ai]"` | Ollama integration for AI test generation |
-| `pip install -e ".[dev]"` | Everything — for development |
+| `pip install playwright-crumb[playwright]` | Playwright wrapper |
+| `pip install playwright-crumb[mcp]` | MCP server (for AI assistants) |
+| `pip install playwright-crumb[ai]` | Ollama integration for AI test generation |
+| `pip install playwright-crumb[playwright,ai,mcp]` | Full feature set |
+
+**Install from source (development):**
+
+```bash
+git clone https://github.com/FaraazSuffla/breadcrumb.git
+cd breadcrumb
+pip install -e ".[dev]"
+playwright install chromium
+```
 
 ---
 
@@ -135,7 +140,7 @@ breadcrumb generate https://myapp.com --out ./tests
 # Scaffold a new project
 breadcrumb init --name myproject         # creates conftest.py + tests/test_sample.py
 
-# Start the MCP server (requires pip install breadcrumb[mcp])
+# Start the MCP server (requires pip install playwright-crumb[mcp])
 breadcrumb mcp
 breadcrumb mcp --db /path/to/.breadcrumb.db
 ```
@@ -169,7 +174,7 @@ Breadcrumb exposes **7 tools via MCP**, letting Claude and other AI assistants q
 **Install:**
 
 ```bash
-pip install -e ".[mcp]"
+pip install playwright-crumb[mcp]
 ```
 
 **Configure Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):

@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "breadcrumb"
+name = "playwright-crumb"
 version = "0.1.0a2"
 description = "Self-healing test framework for Playwright. Your tests survive app changes."
 readme = "README.md"
